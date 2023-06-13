@@ -1,0 +1,311 @@
+[gd_scene load_steps=22 format=3 uid="uid://cct5qhv30okj1"]
+
+[ext_resource type="Script" path="res://scripts/ShaderEditor.gd" id="1_s38sk"]
+[ext_resource type="Texture2D" uid="uid://dkeqxrw5qc6yj" path="res://textures/Forest/icon.png" id="2_8ooqv"]
+[ext_resource type="Script" path="res://scripts/UVSlider.gd" id="2_v0fsk"]
+[ext_resource type="Texture2D" uid="uid://cw5cey5txfmmb" path="res://sprites/xhair.png" id="2_wbo5m"]
+[ext_resource type="Texture2D" uid="uid://chbxx8yrs8rct" path="res://textures/Brick/icon.png" id="3_871dw"]
+[ext_resource type="Texture2D" uid="uid://bvroceo6dcfvo" path="res://sprites/ref.png" id="3_dqja0"]
+[ext_resource type="Texture2D" uid="uid://vi3wniqfw3qn" path="res://textures/Forest/T.png" id="3_uyfoo"]
+[ext_resource type="Texture2D" uid="uid://ce1x5cgihar2c" path="res://textures/Concrete/icon.png" id="4_bdx35"]
+[ext_resource type="Texture2D" uid="uid://u523ye35pcqm" path="res://sprites/ref2.png" id="4_tm17v"]
+[ext_resource type="Texture2D" uid="uid://b1ubqss6ce86q" path="res://textures/Grass/icon.png" id="5_53klj"]
+[ext_resource type="Texture2D" uid="uid://cikdftt0af4eb" path="res://textures/Gravel/icon.png" id="6_7kkcr"]
+[ext_resource type="Texture2D" uid="uid://brv8mtvdd7d6c" path="res://textures/Moss/icon.png" id="7_3litf"]
+[ext_resource type="Texture2D" uid="uid://b80o6qiuacnmd" path="res://textures/Paving/icon.png" id="8_lbr8v"]
+[ext_resource type="Texture2D" uid="uid://cc5t1a7fr0mi7" path="res://textures/Sand/icon.png" id="9_8n0uw"]
+[ext_resource type="Texture2D" uid="uid://ctq2vfopxq3wg" path="res://textures/Wood/icon.png" id="10_f3p5w"]
+[ext_resource type="Texture2D" uid="uid://j2ny1ljiux3t" path="res://textures/Artificial01/icon.png" id="11_jysey"]
+
+[sub_resource type="Shader" id="Shader_nvnx3"]
+code = "shader_type spatial;
+
+uniform sampler2D albedo : filter_linear_mipmap_anisotropic;
+uniform float lambda;
+uniform bool printgrid = false;
+
+void fragment() {
+	// Place fragment code here.
+}
+"
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_f2hwh"]
+render_priority = 0
+shader = SubResource("Shader_nvnx3")
+shader_parameter/lambda = 5.0
+shader_parameter/printgrid = false
+shader_parameter/albedo = ExtResource("3_uyfoo")
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_yr5da"]
+size = Vector2(128, 128)
+subdivide_width = 128
+subdivide_depth = 128
+
+[sub_resource type="Environment" id="Environment_snwpx"]
+background_mode = 1
+background_color = Color(0.737255, 0.780392, 0.886275, 1)
+
+[sub_resource type="CameraAttributesPractical" id="CameraAttributesPractical_p5ik2"]
+
+[node name="Root" type="Node3D"]
+
+[node name="UI" type="Control" parent="."]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+focus_mode = 1
+
+[node name="CodeEdit" type="CodeEdit" parent="UI" node_paths=PackedStringArray("mesh", "shaderSelect", "albedoSelect", "lambdaSlider", "printGridCheck")]
+layout_mode = 1
+anchors_preset = 11
+anchor_left = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -979.0
+offset_top = 5.0
+offset_right = -5.0
+offset_bottom = -6.0
+grow_horizontal = 0
+grow_vertical = 2
+highlight_all_occurrences = true
+scroll_smooth = true
+minimap_draw = true
+caret_blink = true
+gutters_draw_line_numbers = true
+auto_brace_completion_enabled = true
+auto_brace_completion_highlight_matching = true
+script = ExtResource("1_s38sk")
+color_functions = Color(0.376471, 0.756863, 0.976471, 1)
+color_types = Color(0.917647, 0.505882, 0.588235, 1)
+color_keywords = Color(0.768627, 0.607843, 1, 1)
+color_comments = Color(0, 0.666667, 0.458824, 1)
+color_symbols = Color(0.823529, 0.823529, 0.823529, 1)
+color_numbers = Color(0.721569, 0.835294, 0.407843, 1)
+types = Array[String](["int", "float", "vec2", "vec3", "vec4", "uniform", "shader_type", "render_mode", "bool", "sampler2D"])
+keywords = Array[String](["for", "if", "else", "while", "break", "return"])
+mesh = NodePath("../../MeshInstance3D")
+shaderSelect = NodePath("../Panel/ScrollContainer/VBoxContainer/ShaderSelect")
+albedoSelect = NodePath("../Panel/ScrollContainer/VBoxContainer/AlbedoSelect")
+lambdaSlider = NodePath("../Panel/ScrollContainer/VBoxContainer/LambdaSlider")
+printGridCheck = NodePath("../Panel/ScrollContainer/VBoxContainer/PrintGridCheck")
+
+[node name="Compile" type="Button" parent="UI/CodeEdit"]
+layout_mode = 1
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -211.0
+offset_top = -42.0
+offset_right = -11.0
+offset_bottom = -11.0
+grow_horizontal = 0
+grow_vertical = 0
+text = "Compile"
+
+[node name="Panel" type="Panel" parent="UI"]
+layout_mode = 1
+anchors_preset = 9
+anchor_bottom = 1.0
+offset_left = 5.0
+offset_top = 6.0
+offset_right = 216.0
+offset_bottom = -6.0
+grow_vertical = 2
+
+[node name="ScrollContainer" type="ScrollContainer" parent="UI/Panel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 5.0
+offset_top = 5.0
+offset_right = -6.0
+offset_bottom = -6.0
+grow_horizontal = 2
+grow_vertical = 2
+horizontal_scroll_mode = 3
+vertical_scroll_mode = 3
+
+[node name="VBoxContainer" type="VBoxContainer" parent="UI/Panel/ScrollContainer"]
+custom_minimum_size = Vector2(200, 0)
+layout_mode = 2
+theme_override_constants/separation = 40
+
+[node name="HSeparator" type="HSeparator" parent="UI/Panel/ScrollContainer/VBoxContainer"]
+modulate = Color(1, 1, 1, 0)
+layout_mode = 2
+
+[node name="UVSlider" type="Panel" parent="UI/Panel/ScrollContainer/VBoxContainer"]
+custom_minimum_size = Vector2(0, 200)
+layout_mode = 2
+script = ExtResource("2_v0fsk")
+
+[node name="Label" type="RichTextLabel" parent="UI/Panel/ScrollContainer/VBoxContainer/UVSlider"]
+layout_mode = 0
+offset_top = -30.0
+offset_right = 200.0
+offset_bottom = -5.0
+text = "Camera movement
+"
+
+[node name="ref" type="TextureRect" parent="UI/Panel/ScrollContainer/VBoxContainer/UVSlider"]
+modulate = Color(1, 1, 1, 0.32549)
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 40.0
+texture = ExtResource("3_dqja0")
+
+[node name="ref2" type="TextureRect" parent="UI/Panel/ScrollContainer/VBoxContainer/UVSlider"]
+modulate = Color(1, 1, 1, 0.0941176)
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 40.0
+texture = ExtResource("4_tm17v")
+
+[node name="Handle" type="Control" parent="UI/Panel/ScrollContainer/VBoxContainer/UVSlider"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="xhair" type="TextureRect" parent="UI/Panel/ScrollContainer/VBoxContainer/UVSlider/Handle"]
+modulate = Color(1, 1, 1, 0.854902)
+layout_mode = 0
+offset_left = -20.0
+offset_top = -20.0
+offset_right = 20.0
+offset_bottom = 20.0
+mouse_filter = 2
+texture = ExtResource("2_wbo5m")
+
+[node name="ShaderSelect" type="OptionButton" parent="UI/Panel/ScrollContainer/VBoxContainer"]
+layout_mode = 2
+item_count = 5
+selected = 0
+popup/item_0/text = "hn_18"
+popup/item_0/id = 0
+popup/item_1/text = "b_19"
+popup/item_1/id = 3
+popup/item_2/text = "m_22"
+popup/item_2/id = 1
+popup/item_3/text = "ours"
+popup/item_3/id = 2
+popup/item_4/text = "tile"
+popup/item_4/id = 4
+
+[node name="Label3" type="RichTextLabel" parent="UI/Panel/ScrollContainer/VBoxContainer/ShaderSelect"]
+layout_mode = 0
+offset_top = -30.0
+offset_right = 200.0
+offset_bottom = -5.0
+text = "shader"
+
+[node name="AlbedoSelect" type="OptionButton" parent="UI/Panel/ScrollContainer/VBoxContainer"]
+custom_minimum_size = Vector2(0, 200)
+layout_mode = 2
+expand_icon = true
+item_count = 10
+selected = 0
+fit_to_longest_item = false
+popup/item_0/text = ""
+popup/item_0/icon = ExtResource("2_8ooqv")
+popup/item_0/id = 0
+popup/item_1/text = ""
+popup/item_1/icon = ExtResource("3_871dw")
+popup/item_1/id = 1
+popup/item_2/text = ""
+popup/item_2/icon = ExtResource("4_bdx35")
+popup/item_2/id = 2
+popup/item_3/text = ""
+popup/item_3/icon = ExtResource("5_53klj")
+popup/item_3/id = 3
+popup/item_4/text = ""
+popup/item_4/icon = ExtResource("6_7kkcr")
+popup/item_4/id = 4
+popup/item_5/text = ""
+popup/item_5/icon = ExtResource("7_3litf")
+popup/item_5/id = 5
+popup/item_6/text = ""
+popup/item_6/icon = ExtResource("8_lbr8v")
+popup/item_6/id = 6
+popup/item_7/text = ""
+popup/item_7/icon = ExtResource("9_8n0uw")
+popup/item_7/id = 7
+popup/item_8/text = ""
+popup/item_8/icon = ExtResource("10_f3p5w")
+popup/item_8/id = 8
+popup/item_9/text = ""
+popup/item_9/icon = ExtResource("11_jysey")
+popup/item_9/id = 9
+
+[node name="Label2" type="RichTextLabel" parent="UI/Panel/ScrollContainer/VBoxContainer/AlbedoSelect"]
+layout_mode = 0
+offset_top = -30.0
+offset_right = 200.0
+offset_bottom = -5.0
+text = "albedo
+"
+
+[node name="LambdaSlider" type="HSlider" parent="UI/Panel/ScrollContainer/VBoxContainer"]
+layout_mode = 2
+min_value = 1.0
+max_value = 32.0
+step = 0.1
+value = 5.0
+exp_edit = true
+
+[node name="RichTextLabel" type="RichTextLabel" parent="UI/Panel/ScrollContainer/VBoxContainer/LambdaSlider"]
+layout_mode = 0
+offset_left = 171.0
+offset_top = -29.0
+offset_right = 262.0
+offset_bottom = -6.0
+text = "5"
+
+[node name="Label" type="RichTextLabel" parent="UI/Panel/ScrollContainer/VBoxContainer/LambdaSlider"]
+layout_mode = 0
+offset_top = -30.0
+offset_right = 200.0
+offset_bottom = -5.0
+text = "lambda value"
+
+[node name="PrintGridCheck" type="CheckBox" parent="UI/Panel/ScrollContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="Label2" type="RichTextLabel" parent="UI/Panel/ScrollContainer/VBoxContainer/PrintGridCheck"]
+custom_minimum_size = Vector2(0, 25)
+layout_mode = 2
+offset_top = -30.0
+offset_right = 200.0
+offset_bottom = -30.0
+text = "print grid"
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
+material_override = SubResource("ShaderMaterial_f2hwh")
+mesh = SubResource("PlaneMesh_yr5da")
+
+[node name="Camera3D" type="Camera3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 0.93343, 0.358759, 0, -0.358759, 0.93343, 0, 0.534145, 60.2626)
+environment = SubResource("Environment_snwpx")
+attributes = SubResource("CameraAttributesPractical_p5ik2")
+current = true
+
+[connection signal="pressed" from="UI/CodeEdit/Compile" to="UI/CodeEdit" method="compile"]
+[connection signal="uv_offset_changed" from="UI/Panel/ScrollContainer/VBoxContainer/UVSlider" to="UI/CodeEdit" method="set_uvoffset"]
+[connection signal="item_selected" from="UI/Panel/ScrollContainer/VBoxContainer/ShaderSelect" to="UI/CodeEdit" method="load_shader"]
+[connection signal="item_selected" from="UI/Panel/ScrollContainer/VBoxContainer/AlbedoSelect" to="UI/CodeEdit" method="set_albedo"]
+[connection signal="value_changed" from="UI/Panel/ScrollContainer/VBoxContainer/LambdaSlider" to="UI/CodeEdit" method="set_lambda"]
+[connection signal="value_changed" from="UI/Panel/ScrollContainer/VBoxContainer/LambdaSlider" to="UI/Panel/ScrollContainer/VBoxContainer/LambdaSlider/RichTextLabel" method="set_text"]
+[connection signal="toggled" from="UI/Panel/ScrollContainer/VBoxContainer/PrintGridCheck" to="UI/CodeEdit" method="set_printgrid"]
