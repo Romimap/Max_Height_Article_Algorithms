@@ -8,9 +8,8 @@ class Blend {
 protected:
     cv::Mat* m_T1;
     cv::Mat* m_T2;
-    cv::Mat* m_T;
 
-    virtual cv::Vec3b Evaluate(int x, int y, float v1, float v2) = 0;
+    virtual cv::Vec3b Evaluate(cv::Point uv, float v1, float v2, cv::Point off1, cv::Point off2) = 0;
 
 public:
     Blend(cv::Mat* T1, cv::Mat* T2) : m_T1(T1), m_T2(T2) {
@@ -18,23 +17,21 @@ public:
         assert(m_T1->size().height == m_T1->size().height);
         assert(m_T1->type() == m_T1->type());
 
-        m_T = new cv::Mat(m_T1->size().width, m_T1->size().height, m_T1->type(), cv::Scalar(0, 0, 0));
     }
 
-    void Process() {
-        int w = m_T1->size().width;
-        int h = m_T1->size().height;
+    cv::Mat*  Process(cv::Point off1, cv::Point off2) {
+        int w = m_T1->size().width / 4;
+        int h = m_T1->size().height / 4;
+        cv::Mat* T = new cv::Mat(w, h, m_T1->type(), cv::Scalar(0, 0, 0));
 
         #pragma omp parallel for
         for(int x = 0; x < w; x++) {
             for(int y = 0; y < h; y++) {
-                m_T->at<cv::Vec3b>(cv::Point(x, y)) = Evaluate(x, y, (float)x / (float)(w - 1), 1.0f - (float)x / (float)(w - 1));
+                T->at<cv::Vec3b>(cv::Point(x, y)) = Evaluate(cv::Point(x, y), (float)x / (float)(w - 1), 1.0f - (float)x / (float)(w - 1), off1, off2);
             }
         }
-    }
 
-    cv::Mat* getT() {
-        return m_T;
+        return T;
     }
 };
 
