@@ -1,6 +1,7 @@
 #ifndef __LINEAR__
 #define __LINEAR__
 
+#include <opencv2/opencv.hpp>
 #include "blend.h"
 
 
