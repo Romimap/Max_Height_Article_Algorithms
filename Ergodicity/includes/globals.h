@@ -1,6 +1,6 @@
 #ifndef __GLOBALS__
 #define __GLOBALS__
 
-#define T_TIERATIONS 256
+#define T_TIERATIONS 1024
 
 #endif

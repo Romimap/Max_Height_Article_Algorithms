@@ -3,6 +3,7 @@
 
 #include <vector>
 #include <opencv2/opencv.hpp>
+#include "utils.h"
 
 class Ergodicity {
 public:
@@ -16,6 +17,8 @@ public:
     std::vector<std::vector<cv::Scalar>*>* m_ray_stdev;
     std::vector<cv::Scalar>* m_slice_stdev;
     cv::Scalar m_stdev;
+
+    cv::Mat* m_out;
     
     int m_w; //Width of a realisation
     int m_h; //Height of a realisation
@@ -45,7 +48,7 @@ public:
         for (int x = 0; x < m_w; x++) {
             for (int y = 0; y < m_h; y++) {
                 for (int t = 0; t < m_d; t++) {
-                    cv::Scalar xyt(m_realisation->at(t)->at<cv::Vec3b>(cv::Point(x, y)));
+                    cv::Scalar xyt(m_realisation->at(t)->at<cv::Vec3d>(cv::Point(x, y)));
                     m_realisation_mean->at(t) += xyt / (double)(m_w * m_h);
                     m_ray_mean->at(x)->at(y) += xyt / (double)(m_d);
                     m_mean += xyt / (double)(m_w * m_h * m_d);
@@ -93,21 +96,14 @@ public:
         }
 
 
-        cv::Mat out(m_w, m_h, m_realisation->at(0)->type(), cv::Scalar(0, 0, 0));
+        m_out = new cv::Mat(m_w, m_h, CV_64FC3, cv::Scalar(0, 0, 0));
         for (int x = 0; x < m_w; x++) {
             for (int y = 0; y < m_h; y++) {
-                cv::Scalar stdev_xy = m_ray_stdev->at(x)->at(y) * 10;
+                cv::Scalar stdev_xy = m_ray_stdev->at(x)->at(y);
 
-                stdev_xy[0] = std::clamp(stdev_xy[0], 0.0, 255.0);
-                stdev_xy[1] = std::clamp(stdev_xy[1], 0.0, 255.0);
-                stdev_xy[2] = std::clamp(stdev_xy[2], 0.0, 255.0);
-
-                out.at<cv::Vec3b>(cv::Point(x, y)) = cv::Vec3b(stdev_xy[0], stdev_xy[1], stdev_xy[2]);
+                m_out->at<cv::Vec3d>(cv::Point(x, y)) = cv::Vec3d(stdev_xy[0], stdev_xy[1], stdev_xy[2]);
             }
         }
-
-        cv::imwrite("stdev_hex.png", out);
-
     }
 };
 
