@@ -1,0 +1,37 @@
+[gd_scene load_steps=4 format=3 uid="uid://cst78b35cxg2n"]
+
+[ext_resource type="Script" path="res://Line.gd" id="1_54esw"]
+[ext_resource type="Texture2D" uid="uid://c66bp1unymtkt" path="res://maps/Rocks_1K_Displacement.jpg" id="2_5x4jv"]
+[ext_resource type="Texture2D" uid="uid://b1cyop00vx1vq" path="res://maps/Rocks_1K_Color.jpg" id="3_nuu7w"]
+
+[node name="Node2D" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="ColorRect" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Control" type="Control" parent="."]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_left = 22.0
+offset_top = 26.0
+offset_right = -27.0
+offset_bottom = 145.0
+grow_horizontal = 2
+script = ExtResource("1_54esw")
+layer = 575
+res = 1.0
+linesize = 1.695
+height = ExtResource("2_5x4jv")
+color = ExtResource("3_nuu7w")
