@@ -22,12 +22,12 @@ public:
     cv::Mat*  Process(cv::Point off1, cv::Point off2) {
         int w = m_T1->size().width / 4;
         int h = m_T1->size().height / 4;
-        cv::Mat* T = new cv::Mat(w, h, m_T1->type(), cv::Scalar(0, 0, 0));
-
-        #pragma omp parallel for
+        cv::Mat* T = new cv::Mat(1, w, m_T1->type());
+        
+//        #pragma omp parallel for
         for(int x = 0; x < w; x++) {
-            for(int y = 0; y < h; y++) {
-                T->at<cv::Vec3d>(cv::Point(x, y)) = Evaluate(cv::Point(x, y), (float)x / (float)(w - 1), 1.0f - (float)x / (float)(w - 1), off1, off2);
+            for(int y = 0; y < 1; y++) {
+                T->at<cv::Vec3d>(y, x) = Evaluate(cv::Point(x, y), (float)x / (float)(w - 1), 1.0f - (float)x / (float)(w - 1), off1, off2);
             }
         }
 

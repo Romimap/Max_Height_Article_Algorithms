@@ -22,15 +22,15 @@ public:
         m_l = realisations->size();
         
         //Allocation
-        m_realisation = (cv::Vec3d*)calloc(m_w * m_h * m_l, sizeof(cv::Vec3d));
+        m_realisation = (cv::Vec3d*)calloc(m_h * m_w * m_l, sizeof(cv::Vec3d));
 
         //Init
-        int sizes[] = {m_w, m_h};
-        #pragma omp parallel for
+        int sizes[] = {m_h, m_w};
+//        #pragma omp parallel for
         for (int u = 0; u < m_w; u++) {
             for (int v = 0; v < m_h; v++) {
                 for (int t = 0; t < m_l; t++) {
-                    m_realisation[At(u, v, t, sizes)] = realisations->at(t)->at<cv::Vec3d>(u, v);
+                    m_realisation[At(v, u, t, sizes)] = realisations->at(t)->at<cv::Vec3d>(v, u);
                 }
             }
         }
@@ -85,26 +85,26 @@ public:
     void PrecomputeRealisationDistribution() {
         m_precomputedRealisationDistribution = (int**)calloc(m_l, sizeof(int*));
 
-        #pragma omp parallel for
+//        #pragma omp parallel for
         for (int t = 0; t < m_l; t++) {
-            m_precomputedRealisationDistribution[t] = GetRealisationDistribution(t, 0, 0, m_w, m_h);
+            m_precomputedRealisationDistribution[t] = GetRealisationDistribution(t, 0, 0, m_h, m_w);
         }
     }
 
-    int* GetRealisationDistribution(int t, int u1, int v1, int u2, int v2) {
+    int* GetRealisationDistribution(int t, int v1, int u1, int v2, int u2) {
         int* distribution = (int*)calloc(256 * 3, sizeof(int));
-        int rsizes[] = {m_w, m_h};
+        int rsizes[] = {m_h, m_w};
         int dsizes[] = {256};
 
         for (int u = u1; u < u2; u++) {
             for (int v = v1; v < v2; v++) {
-                int b = (int)(m_realisation[At(u, v, t, rsizes)][0] * 255);
-                int g = (int)(m_realisation[At(u, v, t, rsizes)][1] * 255);
-                int r = (int)(m_realisation[At(u, v, t, rsizes)][2] * 255);
+                int b = (int)(m_realisation[At(v, u, t, rsizes)][0] * 255);
+                int g = (int)(m_realisation[At(v, u, t, rsizes)][1] * 255);
+                int r = (int)(m_realisation[At(v, u, t, rsizes)][2] * 255);
 
                 distribution[At(b, 0, dsizes)] += 1;
-                distribution[At(g, 0, dsizes)] += 1;
-                distribution[At(r, 0, dsizes)] += 1;
+                distribution[At(g, 1, dsizes)] += 1;
+                distribution[At(r, 2, dsizes)] += 1;
             }
         }
         
@@ -121,19 +121,19 @@ public:
     void PrecomputeRealisationMean () {
         m_precomputedRealisationMean = (cv::Vec3d*)calloc(m_l, sizeof(cv::Vec3d));
 
-        #pragma omp parallel for
+//        #pragma omp parallel for
         for (int t = 0; t < m_l; t++) {
-            m_precomputedRealisationMean[At(t)] = GetRealisationMean(t, 0, 0, m_w, m_h);
+            m_precomputedRealisationMean[At(t)] = GetRealisationMean(t, 0, 0, m_h, m_w);
         }
     }
 
-    cv::Vec3d GetRealisationMean(int t, int u1, int v1, int u2, int v2) {
+    cv::Vec3d GetRealisationMean(int t, int v1, int u1, int v2, int u2) {
         cv::Vec3d mean(0, 0, 0);
-        int sizes[] = {m_w, m_h};
+        int sizes[] = {m_h, m_w};
 
         for (int u = u1; u < u2; u++) {
             for (int v = v1; v < v2; v++) {
-                mean += m_realisation[At(u, v, t, sizes)];
+                mean += m_realisation[At(v, u, t, sizes)];
             }
         }
 
@@ -151,21 +151,21 @@ public:
     void PrecomputeRealisationVariance () {
         m_precomputedRealisationVariance = (cv::Vec3d*)calloc(m_l, sizeof(cv::Vec3d));
 
-        #pragma omp parallel for
+//        #pragma omp parallel for
         for (int t = 0; t < m_l; t++) {
-            m_precomputedRealisationVariance[At(t)] = GetRealisationVariance(t, 0, 0, m_w, m_h);
+            m_precomputedRealisationVariance[At(t)] = GetRealisationVariance(t, 0, 0, m_h, m_w);
         }
     }
 
-    cv::Vec3d GetRealisationVariance(int t, int u1, int v1, int u2, int v2) {
+    cv::Vec3d GetRealisationVariance(int t, int v1, int u1, int v2, int u2) {
         cv::Vec3d variance(0, 0, 0);
-        int sizes[] = {m_w, m_h};
+        int sizes[] = {m_h, m_w};
 
-        cv::Vec3d meanuv1uv2 = GetRealisationMean(t, u1, v1, u2, v2);
+        cv::Vec3d meanuv1uv2 = GetRealisationMean(t, v1, u1, v2, u2);
 
         for (int u = u1; u < u2; u++) {
             for (int v = v1; v < v2; v++) {
-                cv::Vec3d diff = meanuv1uv2 - m_realisation[At(u, v, t, sizes)];
+                cv::Vec3d diff = meanuv1uv2 - m_realisation[At(v, u, t, sizes)];
                 diff[0] = diff[0] * diff[0];
                 diff[1] = diff[1] * diff[1];
                 diff[2] = diff[2] * diff[2];
@@ -186,98 +186,98 @@ public:
 
     int** m_precomputedRayDistributions = nullptr;
     void PrecomputeRayDistributions() {
-        m_precomputedRayDistributions = (int**)calloc(m_w * m_h, sizeof(int*));
-        int sizes[] = {m_w};
+        m_precomputedRayDistributions = (int**)calloc(m_h * m_w, sizeof(int*));
+        int sizes[] = {m_h};
 
-        #pragma omp parallel for
+//        #pragma omp parallel for
         for (int u = 0; u < m_w; u++) {
             for (int v = 0; v < m_h; v++) {
-                m_precomputedRayDistributions[At(u, v, sizes)] = GetRayDistribution(u, v, 0, m_l);
+                m_precomputedRayDistributions[At(v, u, sizes)] = GetRayDistribution(v, u, 0, m_l);
             }
         }
 
 
     }
 
-    int* GetRayDistribution(int u, int v, int t1, int t2) {
+    int* GetRayDistribution(int v, int u, int t1, int t2) {
         int* distribution = (int*)calloc(256 * 3, sizeof(int));
-        int rsizes[] = {m_w, m_h};
+        int rsizes[] = {m_h, m_w};
         int dsizes[] = {256};
 
         for (int t = t1; t < t2; t++) {
 
-            int b = (int)(m_realisation[At(u, v, t, rsizes)][0] * 255);
-            int g = (int)(m_realisation[At(u, v, t, rsizes)][1] * 255);
-            int r = (int)(m_realisation[At(u, v, t, rsizes)][2] * 255);
+            int b = (int)(m_realisation[At(v, u, t, rsizes)][0] * 255);
+            int g = (int)(m_realisation[At(v, u, t, rsizes)][1] * 255);
+            int r = (int)(m_realisation[At(v, u, t, rsizes)][2] * 255);
 
             distribution[At(b, 0, dsizes)] += 1;
-            distribution[At(g, 0, dsizes)] += 1;
-            distribution[At(r, 0, dsizes)] += 1;
+            distribution[At(g, 1, dsizes)] += 1;
+            distribution[At(r, 2, dsizes)] += 1;
         }
         
         return distribution;
     }
 
-    int* GetRayDistribution(int u, int v) {
-        int sizes[] = {m_w};
-        return m_precomputedRayDistributions[At(u, v, sizes)];
+    int* GetRayDistribution(int v, int u) {
+        int sizes[] = {m_h};
+        return m_precomputedRayDistributions[At(v, u, sizes)];
     }
 
     // ** MEAN
 
     cv::Vec3d* m_precomputedRayMean;
     void PrecomputeRayMean () {
-        m_precomputedRayMean = (cv::Vec3d*)calloc(m_w * m_h, sizeof(cv::Vec3d));
-        int sizes[] = {m_w};
+        m_precomputedRayMean = (cv::Vec3d*)calloc(m_h * m_w, sizeof(cv::Vec3d));
+        int sizes[] = {m_h};
 
-        #pragma omp parallel for
+//        #pragma omp parallel for
         for (int u = 0; u < m_w; u++) {
             for (int v = 0; v < m_h; v++) {
-                m_precomputedRayMean[At(u, v, sizes)] = GetRayMean(u, v, 0, m_l);
+                m_precomputedRayMean[At(v, u, sizes)] = GetRayMean(v, u, 0, m_l);
             }
         }
     }
 
-    cv::Vec3d GetRayMean(int u, int v, int t1, int t2) {
+    cv::Vec3d GetRayMean(int v, int u, int t1, int t2) {
         cv::Vec3d mean(0, 0, 0);
-        int sizes[] = {m_w, m_h};
+        int sizes[] = {m_h, m_w};
 
         for (int t = t1; t < t2; t++) {
-            mean += m_realisation[At(u, v, t, sizes)];
+            mean += m_realisation[At(v, u, t, sizes)];
         }
 
         mean /= (double)(t2 - t1);
         return mean;
     }
 
-    cv::Vec3d GetRayMean(int u, int v) {
-        int sizes[] = {m_w};
-        return m_precomputedRayMean[At(u, v, sizes)];
+    cv::Vec3d GetRayMean(int v, int u) {
+        int sizes[] = {m_h};
+        return m_precomputedRayMean[At(v, u, sizes)];
     }
 
     // ** VARIANCE
 
     cv::Vec3d* m_precomputedRayVariance;
     void PrecomputeRayVariance () {
-        m_precomputedRayVariance = (cv::Vec3d*)calloc(m_w * m_h, sizeof(cv::Vec3d));
-        int sizes[] = {m_w};
+        m_precomputedRayVariance = (cv::Vec3d*)calloc(m_h * m_w, sizeof(cv::Vec3d));
+        int sizes[] = {m_h};
 
-        #pragma omp parallel for
+//        #pragma omp parallel for
         for (int u = 0; u < m_w; u++) {
             for (int v = 0; v < m_h; v++) {
-                m_precomputedRayVariance[At(u, v, sizes)] = GetRayVariance(u, v, 0, m_l);
+                m_precomputedRayVariance[At(v, u, sizes)] = GetRayVariance(v, u, 0, m_l);
             }
         }
     }
 
-    cv::Vec3d GetRayVariance(int u, int v, int t1, int t2) {
+    cv::Vec3d GetRayVariance(int v, int u, int t1, int t2) {
         cv::Vec3d variance(0, 0, 0);
-        int sizes[] = {m_w, m_h};
+        int sizes[] = {m_h, m_w};
 
-        cv::Vec3d meant1t2 = GetRayMean(u, v, t1, t2);
+        cv::Vec3d meant1t2 = GetRayMean(v, u, t1, t2);
 
         for (int t = t1; t < t2; t++) {
-            cv::Vec3d x = m_realisation[At(u, v, t, sizes)];
+            cv::Vec3d x = m_realisation[At(v, u, t, sizes)];
             cv::Vec3d diff = meant1t2 - x;
             diff[0] = diff[0] * diff[0];
             diff[1] = diff[1] * diff[1];
@@ -289,9 +289,9 @@ public:
         return variance;
     }
 
-    cv::Vec3d GetRayVariance(int u, int v) {
-        int sizes[] = {m_w};
-        return m_precomputedRayVariance[At(u, v, sizes)];
+    cv::Vec3d GetRayVariance(int v, int u) {
+        int sizes[] = {m_h};
+        return m_precomputedRayVariance[At(v, u, sizes)];
     }
 };
 

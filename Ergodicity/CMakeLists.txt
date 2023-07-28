@@ -3,8 +3,8 @@ project(Ergodicity)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 #Set the two textures to test here (only works for .png files)
-set(T1 TileBW.png)
-set(T2 TileBW.png)
+set(T1 Paving.png)
+set(T2 Paving.png)
 
 #Open CV
 find_package(OpenCV REQUIRED)

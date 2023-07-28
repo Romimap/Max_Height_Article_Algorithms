@@ -6,6 +6,9 @@
 #include "processmetrics.h"
 #include "../includes/globals.h"
 #include "utils.h"
+#include <iostream>
+#include <fstream>
+
 
 void printVec3 (cv::Vec3d s) {
 	printf("(%f, %f, %f)\n", s[0], s[1], s[2]);
@@ -37,11 +40,11 @@ int main () {
 
 	ProcessMetrics processMetrics(realisation);
 	
-	cv::Mat rayMean(processMetrics.m_w, processMetrics.m_h, CV_64FC3, cv::Scalar(0, 0, 0));
+	cv::Mat rayMean(processMetrics.m_h, processMetrics.m_w, CV_64FC3, cv::Scalar(0, 0, 0));
 
 	for (int u = 0; u < processMetrics.m_w; u++) {
 		for (int v = 0; v < processMetrics.m_h; v++) {
-			rayMean.at<cv::Vec3d>(u, v) = processMetrics.GetRayMean(u, v);
+			rayMean.at<cv::Vec3d>(v, u) = processMetrics.GetRayMean(v, u);
 		}
 	}
 
@@ -52,11 +55,11 @@ int main () {
 	save("rayMean100.png", &rayMean);
 
 
-	cv::Mat rayVar(processMetrics.m_w, processMetrics.m_h, CV_64FC3, cv::Scalar(0, 0, 0));
+	cv::Mat rayVar(processMetrics.m_h, processMetrics.m_w, CV_64FC3, cv::Scalar(0, 0, 0));
 
 	for (int u = 0; u < processMetrics.m_w; u++) {
 		for (int v = 0; v < processMetrics.m_h; v++) {
-			rayVar.at<cv::Vec3d>(u, v) = processMetrics.GetRayVariance(u, v);
+			rayVar.at<cv::Vec3d>(v, u) = processMetrics.GetRayVariance(v, u);
 		}
 	}
 
@@ -66,5 +69,26 @@ int main () {
 	scale(&rayVar, 10);
 	save("rayVar100.png", &rayVar);
 
-	return 0;
+	cv::Mat h(256, processMetrics.m_w, CV_64FC3);
+
+	int max = 0;
+	for (int u = 0; u < processMetrics.m_w; u++) {
+		int* distribution = processMetrics.GetRayDistribution(0, u);
+		int sizes[] = {256};
+		for (int n = 0; n < 256; n++) {
+			int b = distribution[processMetrics.At(n, 0, sizes)];
+			int g = distribution[processMetrics.At(n, 1, sizes)];
+			int r = distribution[processMetrics.At(n, 2, sizes)];
+
+			if (max < b) max = b;
+			if (max < g) max = g;
+			if (max < r) max = r;
+
+			h.at<cv::Vec3d>(n, u) = cv::Vec3d(b, g, r);
+		}
+	}
+
+	scale(&h, 1.0/double(max));
+
+	save("h.png", &h);
 }
