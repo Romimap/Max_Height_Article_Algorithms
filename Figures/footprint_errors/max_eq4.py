@@ -7,7 +7,7 @@ from tqdm import tqdm
 
 start = time.time()
 
-def do(TEX1, TEX2, LAMBDA):
+def do(TEX1, TEX2):
     T1 = ut.cut(ut.load(f"tex/{TEX1}_T.png"), 0, 1024, 0, 1024)
     T2 = ut.cut(ut.load(f"tex/{TEX2}_T.png"), 0, 1024, 0, 1024)
     S1 = ut.cut(ut.load(f"tex/{TEX1}_S.png"), 0, 1024, 0, 1024)
@@ -25,27 +25,18 @@ def do(TEX1, TEX2, LAMBDA):
                 V1[y, x, c] = v1
                 V2[y, x, c] = v2
 
+    MAXP = np.zeros(T1.shape)
+    for y in tqdm(range(MAXP.shape[0]), desc="maxp"):
+        for x in range(MAXP.shape[1]):
+            w1 = 0
+            if V1[y, x, 0] + S1[y, x, 0] > V2[y, x, 0] + S2[y, x, 0]: w1 = 1
+            w2 = 1 - w1
+            for c in range(MAXP.shape[2]):
+                MAXP[y, x, c] = w1 * T1[y, x, c] + w2 * T2[y, x, c]
 
 
-    for i in tqdm([0, 2, 4, 6], desc="processing mip map levels"):
-        MU1 = ut.add(ut.mipmap(S1, i), ut.mipmap(V1, i))
-        MU2 = ut.add(ut.mipmap(S2, i), ut.mipmap(V2, i))
-        MU = ut.sub(MU2, MU1)
+    for i in tqdm([0, 2, 4, 6], desc="processing mip map levels"): 
+        T = ut.mipmap(MAXP, i)
+        ut.save(f"batch/eq4_{TEX1}_{TEX2}_mipmap{i}.png", T)
 
-        VAR1 = ut.mipmapvar(S1, i)
-        VAR2 = ut.mipmapvar(S2, i)
-        VAR = ut.isqrt(ut.addf(ut.add(VAR1, VAR2), LAMBDA))
-
-        Z = ut.div(MU, VAR)
-
-        W1 = ut.oneminus(ut.Phi(Z))
-        W2 = ut.oneminus(W1)
-
-        W1T1 = ut.mul(W1, ut.mipmap(T1, i))
-        W2T2 = ut.mul(W2, ut.mipmap(T2, i))
-
-        T = ut.add(W1T1, W2T2)
-
-        ut.save(f"batch/eq8_{TEX1}_{TEX2}_mipmap{i}.png", T)
-
-do("Brick", "Moss", 0)
+do("Brick", "Moss")
