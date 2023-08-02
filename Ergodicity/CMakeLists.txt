@@ -29,13 +29,13 @@ add_custom_command(
     TARGET Ergodicity POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy
             ${CMAKE_SOURCE_DIR}/textures/${T1}
-            ${CMAKE_BINARY_DIR}/bin/textures/T1.png)
+            ${CMAKE_BINARY_DIR}/bin/T1.png)
 
 add_custom_command(
     TARGET Ergodicity POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy
             ${CMAKE_SOURCE_DIR}/textures/${T2}
-            ${CMAKE_BINARY_DIR}/bin/textures/T2.png)
+            ${CMAKE_BINARY_DIR}/bin/T2.png)
             
 
 
