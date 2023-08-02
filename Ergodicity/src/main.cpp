@@ -2,7 +2,9 @@
 #include <string>
 #include <vector>
 #include "hex.h"
+#include "maxpriority.h"
 #include "linear.h"
+#include "variancepreserving.h"
 #include "processmetrics.h"
 #include "../includes/globals.h"
 #include "utils.h"
@@ -14,8 +16,16 @@ void printVec3 (cv::Vec3d s) {
 	printf("(%f, %f, %f)\n", s[0], s[1], s[2]);
 }
 
-using Method = Linear;
+#ifndef METHOD
+ #define METHOD Linear
+#endif
 
+#ifndef OUTPATH
+ #define OUTPATH "Sand_h_lin.png"
+#endif
+
+using Method = METHOD;
+const char* outpath = OUTPATH;
 
 int main () {
 	std::string T1_PATH = "textures/T1.png";
@@ -26,7 +36,7 @@ int main () {
 	std::vector<cv::Mat*>* realisation = new std::vector<cv::Mat*>();
 
 	for (int i = 0; i < T_TIERATIONS; i++) {
-		if (i%32 == 0) printf("%d\n", i);
+		if ((i + 1)%1024 == 1) printf("%d\n", i);
 		cv::Point off1(rand(), rand());
 		cv::Point off2(rand(), rand());
 
@@ -40,35 +50,6 @@ int main () {
 
 	ProcessMetrics processMetrics(realisation);
 	
-	cv::Mat rayMean(processMetrics.m_h, processMetrics.m_w, CV_64FC3, cv::Scalar(0, 0, 0));
-
-	for (int u = 0; u < processMetrics.m_w; u++) {
-		for (int v = 0; v < processMetrics.m_h; v++) {
-			rayMean.at<cv::Vec3d>(v, u) = processMetrics.GetRayMean(v, u);
-		}
-	}
-
-	save("rayMean.png", &rayMean);
-	scale(&rayMean, 10);
-	save("rayMean10.png", &rayMean);
-	scale(&rayMean, 10);
-	save("rayMean100.png", &rayMean);
-
-
-	cv::Mat rayVar(processMetrics.m_h, processMetrics.m_w, CV_64FC3, cv::Scalar(0, 0, 0));
-
-	for (int u = 0; u < processMetrics.m_w; u++) {
-		for (int v = 0; v < processMetrics.m_h; v++) {
-			rayVar.at<cv::Vec3d>(v, u) = processMetrics.GetRayVariance(v, u);
-		}
-	}
-
-	save("rayVar.png", &rayVar);
-	scale(&rayVar, 10);
-	save("rayVar10.png", &rayVar);
-	scale(&rayVar, 10);
-	save("rayVar100.png", &rayVar);
-
 	cv::Mat h(256, processMetrics.m_w, CV_64FC3);
 
 	int max = 0;
@@ -84,11 +65,13 @@ int main () {
 			if (max < g) max = g;
 			if (max < r) max = r;
 
-			h.at<cv::Vec3d>(n, u) = cv::Vec3d(b, g, r);
+			h.at<cv::Vec3d>(255 - n, u) = cv::Vec3d(b, g, r);
 		}
 	}
 
+	max = T_TIERATIONS / 32;
+
 	scale(&h, 1.0/double(max));
 
-	save("h.png", &h);
+	save(outpath, &h);
 }

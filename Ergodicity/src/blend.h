@@ -13,20 +13,20 @@ protected:
 
 public:
     Blend(cv::Mat* T1, cv::Mat* T2) : m_T1(T1), m_T2(T2) {
-        assert(m_T1->size().width == m_T1->size().width);
-        assert(m_T1->size().height == m_T1->size().height);
-        assert(m_T1->type() == m_T1->type());
+        assert(m_T1->size().width == m_T2->size().width);
+        assert(m_T1->size().height == m_T2->size().height);
+        assert(m_T1->type() == m_T2->type());
 
     }
 
-    cv::Mat*  Process(cv::Point off1, cv::Point off2) {
+    cv::Mat* Process(cv::Point off1, cv::Point off2) {
         int w = m_T1->size().width / 4;
-        int h = m_T1->size().height / 4;
-        cv::Mat* T = new cv::Mat(1, w, m_T1->type());
+        int h = 1;
+        cv::Mat* T = new cv::Mat(h, w, m_T1->type());
         
 //        #pragma omp parallel for
         for(int x = 0; x < w; x++) {
-            for(int y = 0; y < 1; y++) {
+            for(int y = 0; y < h; y++) {
                 T->at<cv::Vec3d>(y, x) = Evaluate(cv::Point(x, y), (float)x / (float)(w - 1), 1.0f - (float)x / (float)(w - 1), off1, off2);
             }
         }

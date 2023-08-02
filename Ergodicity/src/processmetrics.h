@@ -37,16 +37,16 @@ public:
 
         printf("Precomputing rays distribution ...\n");
         PrecomputeRayDistributions();
-        printf("Precomputing realisations distribution ...\n");
-        PrecomputeRealisationDistribution();
-        printf("Precomputing rays mean ...\n");
-        PrecomputeRayMean();
-        printf("Precomputing realisations mean ...\n");
-        PrecomputeRealisationMean();
-        printf("Precomputing rays variance ...\n");
-        PrecomputeRayVariance();
-        printf("Precomputing realisations variance ...\n");
-        PrecomputeRealisationVariance();
+        //printf("Precomputing realisations distribution ...\n");
+        //PrecomputeRealisationDistribution();
+        //printf("Precomputing rays mean ...\n");
+        //PrecomputeRayMean();
+        //printf("Precomputing realisations mean ...\n");
+        //PrecomputeRealisationMean();
+        //printf("Precomputing rays variance ...\n");
+        //PrecomputeRayVariance();
+        //printf("Precomputing realisations variance ...\n");
+        //PrecomputeRealisationVariance();
         
         printf("Done !\n");
     }
@@ -192,7 +192,7 @@ public:
 //        #pragma omp parallel for
         for (int u = 0; u < m_w; u++) {
             for (int v = 0; v < m_h; v++) {
-                m_precomputedRayDistributions[At(v, u, sizes)] = GetRayDistribution(v, u, 0, m_l);
+                 m_precomputedRayDistributions[At(v, u, sizes)] = GetRayDistribution(v, u, 0, m_l);
             }
         }
 
