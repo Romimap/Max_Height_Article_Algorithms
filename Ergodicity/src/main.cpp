@@ -145,6 +145,9 @@ int main () {
 	T1 = load("T1.png");
 	T2 = load("T2.png");
 
+	VariancePreserving vp(T1, T2);
+	return 0;
+
 	runLinear();
 	runHex();
 	runBlend();
