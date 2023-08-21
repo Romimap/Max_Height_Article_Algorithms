@@ -88,7 +88,7 @@ private:
     cv::Vec3d inverseTransform(cv::Vec3d G, std::vector<Entry> lut[]) {
         cv::Vec3d U;
         cv::Vec3d ans;
-        for (int c = 0; c < 2; c++) {
+        for (int c = 0; c < 3; c++) {
             U[c] = CDF(G[c], GAUSSIAN_AVERAGE, GAUSSIAN_STD);
             int i = U[c] * lut[c].size();
             if (i < 0) i = 0;
@@ -96,6 +96,20 @@ private:
             ans[c] = lut[c][i].v;
         }
         return ans;
+    }
+
+    cv::Mat* inverseTransform(cv::Mat *T, std::vector<Entry> lut[]) {
+        cv::Mat* out = new cv::Mat(T->size().height, T->size().width, T->type());
+
+        for (int x = 0; x < T->size().width; x++) {
+            for (int y = 0; y < T->size().height; y++) {
+                cv::Vec3d G = T->at<cv::Vec3d>(y, x);
+                cv::Vec3d D = inverseTransform(G, lut);
+                out->at<cv::Vec3d>(y, x) = D;
+            }
+        }
+
+        return out;
     }
 
 public:
@@ -109,22 +123,20 @@ public:
         uv2.y %= m_T1->size().height;
 
 
-        cv::Vec3d t1 = m_gaussianT1->at<cv::Vec3d>(uv1) - cv::Vec3d(GAUSSIAN_AVERAGE);
-        cv::Vec3d t2 = m_gaussianT2->at<cv::Vec3d>(uv2) - cv::Vec3d(GAUSSIAN_AVERAGE);
+        cv::Vec3d t1 = m_gaussianT1->at<cv::Vec3d>(uv1);
+        cv::Vec3d t2 = m_gaussianT2->at<cv::Vec3d>(uv2);
+        cv::Vec3d e =  cv::Vec3d(GAUSSIAN_AVERAGE, GAUSSIAN_AVERAGE, GAUSSIAN_AVERAGE);
 
-
-        double s = sqrt(pow(v1, 2) + pow(v2, 2)) + 0.2;
-        cv::Vec3d t = (v1 * t1 + v2 * t2) / s + cv::Vec3d(GAUSSIAN_AVERAGE);
+        cv::Vec3d t = ((v1 * t1 + v2 * t2 - e) / sqrt(v1*v1 + v2*v2)) + e;
         
         return inverseTransform(t, lut1);
     }
 
     VariancePreserving (cv::Mat* T1, cv::Mat* T2) : Blend(T1, T2) {
+        save("m_T1.png", m_T1);
+
         m_gaussianT1 = ComputeHistogramTransformation(T1, lut1);
         m_gaussianT2 = ComputeHistogramTransformation(T2, lut2);
-
-        save("m_T1.png", m_T1);
-        save("m_gaussianT1.png", m_gaussianT1);
     }
 };
 
