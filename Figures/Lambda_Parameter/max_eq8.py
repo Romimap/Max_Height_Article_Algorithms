@@ -62,4 +62,6 @@ def do(TEX1, TEX2, LAMBDA, ID):
         print("T done")
 
 
+do("Brick", "Moss", 0.000, "without")
+do("Brick", "Moss", 0.001, "with")
 
