@@ -14,6 +14,7 @@ extends CodeEdit
 @export var shaderSelect : OptionButton
 @export var albedoSelect : OptionButton
 @export var lambdaSlider : Slider
+@export var betaSlider : Slider
 @export var printGridCheck : CheckBox
 
 var shaderMat : ShaderMaterial
@@ -43,6 +44,9 @@ func load_shader (id : int):
 	lambdaSlider.editable = true if name in ["m_22", "b_19"] else false
 	lambdaSlider.visible = true if name in ["m_22", "b_19"] else false
 	
+	betaSlider.editable = true if name in ["m_22"] else false
+	betaSlider.visible = true if name in ["m_22"] else false
+	
 	printGridCheck.disabled = false if name in ["m_22", "b_19", "hn_18", "ours"] else true
 	printGridCheck.visible = true if name in ["m_22", "b_19", "hn_18", "ours"] else false
 	
@@ -67,6 +71,10 @@ func set_albedo(id : int):
 #Called on "LambdaSlider" input
 func set_lambda(t : float):
 	shaderMat.set_shader_parameter("lambda", t)
+
+func set_beta(t : float):
+	shaderMat.set_shader_parameter("beta", t)
+
 
 #Called on "PrintGridCheck" input
 func set_printgrid(b : bool):

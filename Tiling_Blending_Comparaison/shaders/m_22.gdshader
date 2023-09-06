@@ -4,6 +4,7 @@ render_mode unshaded;
 uniform sampler2D albedo : filter_linear_mipmap_anisotropic;
 uniform bool printgrid = false;
 uniform float lambda;
+uniform float beta = 1.0;
 uniform vec2 uvoffset;
 
 vec2 hash(in ivec2 p) {
@@ -52,7 +53,7 @@ void TriangleGrid(in vec2 p_uv, inout vec3 Bi, inout ivec2 vertex1, inout ivec2 
 }
 
 float metric(vec3 c) {
-	return c.r * 0.299 + c.g * 0.587 + c.b * 0.114;
+	return 1.0 - beta + beta * (c.r * 0.299 + c.g * 0.587 + c.b * 0.114);
 }
 
 vec3 hex_tiling(vec2 uv, sampler2D tex) {

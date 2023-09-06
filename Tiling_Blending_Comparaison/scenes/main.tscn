@@ -60,7 +60,7 @@ size_flags_horizontal = 3
 size_flags_vertical = 3
 focus_mode = 1
 
-[node name="CodeEdit" type="CodeEdit" parent="UI" node_paths=PackedStringArray("mesh", "shaderSelect", "albedoSelect", "lambdaSlider", "printGridCheck")]
+[node name="CodeEdit" type="CodeEdit" parent="UI" node_paths=PackedStringArray("mesh", "shaderSelect", "albedoSelect", "lambdaSlider", "betaSlider", "printGridCheck")]
 layout_mode = 1
 anchors_preset = 11
 anchor_left = 1.0
@@ -92,6 +92,7 @@ mesh = NodePath("../../MeshInstance3D")
 shaderSelect = NodePath("../Panel/ScrollContainer/VBoxContainer/ShaderSelect")
 albedoSelect = NodePath("../Panel/ScrollContainer/VBoxContainer/AlbedoSelect")
 lambdaSlider = NodePath("../Panel/ScrollContainer/VBoxContainer/LambdaSlider")
+betaSlider = NodePath("../Panel/ScrollContainer/VBoxContainer/BetaSlider")
 printGridCheck = NodePath("../Panel/ScrollContainer/VBoxContainer/PrintGridCheck")
 
 [node name="Compile" type="Button" parent="UI/CodeEdit"]
@@ -260,10 +261,10 @@ text = "albedo
 
 [node name="LambdaSlider" type="HSlider" parent="UI/Panel/ScrollContainer/VBoxContainer"]
 layout_mode = 2
-min_value = 1.0
+min_value = 0.1
 max_value = 32.0
 step = 0.1
-value = 5.0
+value = 7.0
 exp_edit = true
 
 [node name="RichTextLabel" type="RichTextLabel" parent="UI/Panel/ScrollContainer/VBoxContainer/LambdaSlider"]
@@ -272,7 +273,7 @@ offset_left = 171.0
 offset_top = -29.0
 offset_right = 262.0
 offset_bottom = -6.0
-text = "5"
+text = "7.0"
 
 [node name="Label" type="RichTextLabel" parent="UI/Panel/ScrollContainer/VBoxContainer/LambdaSlider"]
 layout_mode = 0
@@ -280,6 +281,29 @@ offset_top = -30.0
 offset_right = 200.0
 offset_bottom = -5.0
 text = "lambda value"
+
+[node name="BetaSlider" type="HSlider" parent="UI/Panel/ScrollContainer/VBoxContainer"]
+layout_mode = 2
+min_value = 0.1
+max_value = 32.0
+step = 0.1
+value = 0.6
+exp_edit = true
+
+[node name="RichTextLabel" type="RichTextLabel" parent="UI/Panel/ScrollContainer/VBoxContainer/BetaSlider"]
+layout_mode = 0
+offset_left = 171.0
+offset_top = -29.0
+offset_right = 262.0
+offset_bottom = -6.0
+text = "0.6"
+
+[node name="Label" type="RichTextLabel" parent="UI/Panel/ScrollContainer/VBoxContainer/BetaSlider"]
+layout_mode = 0
+offset_top = -30.0
+offset_right = 200.0
+offset_bottom = -5.0
+text = "beta value"
 
 [node name="PrintGridCheck" type="CheckBox" parent="UI/Panel/ScrollContainer/VBoxContainer"]
 layout_mode = 2
@@ -308,4 +332,6 @@ current = true
 [connection signal="item_selected" from="UI/Panel/ScrollContainer/VBoxContainer/AlbedoSelect" to="UI/CodeEdit" method="set_albedo"]
 [connection signal="value_changed" from="UI/Panel/ScrollContainer/VBoxContainer/LambdaSlider" to="UI/CodeEdit" method="set_lambda"]
 [connection signal="value_changed" from="UI/Panel/ScrollContainer/VBoxContainer/LambdaSlider" to="UI/Panel/ScrollContainer/VBoxContainer/LambdaSlider/RichTextLabel" method="set_text"]
+[connection signal="value_changed" from="UI/Panel/ScrollContainer/VBoxContainer/BetaSlider" to="UI/CodeEdit" method="set_beta"]
+[connection signal="value_changed" from="UI/Panel/ScrollContainer/VBoxContainer/BetaSlider" to="UI/Panel/ScrollContainer/VBoxContainer/BetaSlider/RichTextLabel" method="set_text"]
 [connection signal="toggled" from="UI/Panel/ScrollContainer/VBoxContainer/PrintGridCheck" to="UI/CodeEdit" method="set_printgrid"]
