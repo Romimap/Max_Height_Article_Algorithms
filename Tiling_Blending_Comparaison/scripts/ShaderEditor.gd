@@ -41,11 +41,11 @@ func _ready():
 func load_shader (id : int):
 	var name = shaderSelect.get_item_text(id)
 	
-	lambdaSlider.editable = true if name in ["m_22", "b_19"] else false
-	lambdaSlider.visible = true if name in ["m_22", "b_19"] else false
+	lambdaSlider.editable = true if name in ["m_22", "b_19", "ours"] else false
+	lambdaSlider.visible = true if name in ["m_22", "b_19", "ours"] else false
 	
-	betaSlider.editable = true if name in ["m_22"] else false
-	betaSlider.visible = true if name in ["m_22"] else false
+	betaSlider.editable = true if name in ["m_22", "ours"] else false
+	betaSlider.visible = true if name in ["m_22", "ours"] else false
 	
 	printGridCheck.disabled = false if name in ["m_22", "b_19", "hn_18", "ours"] else true
 	printGridCheck.visible = true if name in ["m_22", "b_19", "hn_18", "ours"] else false
@@ -65,8 +65,10 @@ func compile ():
 # Called on "AlbedoSelect" input
 func set_albedo(id : int):
 	var iconpath = albedoSelect.get_item_icon(id).resource_path
-	var path = iconpath.replace("icon.png", "T.png")
-	shaderMat.set_shader_parameter("albedo", ResourceLoader.load(path))
+	var Tpath = iconpath.replace("icon.png", "T.png")
+	var BMpath = iconpath.replace("icon.png", "BM.png")
+	shaderMat.set_shader_parameter("albedo", ResourceLoader.load(Tpath))
+	shaderMat.set_shader_parameter("bm", ResourceLoader.load(BMpath))
 
 #Called on "LambdaSlider" input
 func set_lambda(t : float):

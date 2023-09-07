@@ -261,10 +261,9 @@ text = "albedo
 
 [node name="LambdaSlider" type="HSlider" parent="UI/Panel/ScrollContainer/VBoxContainer"]
 layout_mode = 2
-min_value = 0.1
 max_value = 32.0
-step = 0.1
-value = 7.0
+step = 0.0
+value = 1.0
 exp_edit = true
 
 [node name="RichTextLabel" type="RichTextLabel" parent="UI/Panel/ScrollContainer/VBoxContainer/LambdaSlider"]
@@ -273,7 +272,7 @@ offset_left = 171.0
 offset_top = -29.0
 offset_right = 262.0
 offset_bottom = -6.0
-text = "7.0"
+text = "1"
 
 [node name="Label" type="RichTextLabel" parent="UI/Panel/ScrollContainer/VBoxContainer/LambdaSlider"]
 layout_mode = 0
@@ -284,9 +283,8 @@ text = "lambda value"
 
 [node name="BetaSlider" type="HSlider" parent="UI/Panel/ScrollContainer/VBoxContainer"]
 layout_mode = 2
-min_value = 0.1
 max_value = 32.0
-step = 0.1
+step = 0.0
 value = 0.6
 exp_edit = true
 
