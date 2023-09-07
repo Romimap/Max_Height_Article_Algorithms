@@ -3,7 +3,7 @@ import methods as mt
 import utils as ut
 
 
-def figure_1():
+def figure_teaser():
     w = 1024
     h = 1024
 
@@ -47,17 +47,27 @@ def figure_1():
         transitions.append(T)
         ut.save(f"t{i}.png", T)
 
-    print("build figure")
-    #build figure
-    T = np.zeros((h, w * (N - 1), 3))
-    for i in range(len(transitions)):
-        print(i)
-        for y in range(h):
-            for x in range(w):
-                for c in range(3):
-                    T[y, x + (w * i), c] = transitions[i][y, x, c]
+def figure_aliasing_artefact_base_variance():
+    T1 = ut.load("textures/Brick_T.png")
+    T2 = ut.load("textures/Forest_T.png")
+    S1 = ut.load("textures/Brick_S.png")
+    S2 = ut.load("textures/Forest_S.png")
+    V1 = ut.load("textures/v_constant.png")
+    V2 = V1
 
-    ut.save("t.png", T)
+    T1 = ut.cut(T1, 0, 512, 0, 512)
+    T2 = ut.cut(T2, 0, 512, 0, 512)
+    S1 = ut.cut(S1, 0, 512, 0, 512)
+    S2 = ut.cut(S2, 0, 512, 0, 512)
+
+    T_without = mt.mixmax(T1, T2, S1, S2, V1, V2, 0, 0)
+    T_with = mt.mixmax(T1, T2, S1, S2, V1, V2, 0, 0.00005)
+
+    ut.save("without_base_variance.png", T_without)
+    ut.save("with_base_variance.png", T_with)
 
 
-figure_1()
+
+
+
+figure_aliasing_artefact_base_variance()
