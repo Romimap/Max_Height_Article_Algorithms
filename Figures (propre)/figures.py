@@ -30,7 +30,6 @@ def figure_teaser():
         T = ut.load(f"textures/{name}_T.png")
         S = ut.load(f"textures/{name}_S.png")
 
-
         textures.append(T)
         priority_maps.append(S)
 
@@ -45,7 +44,8 @@ def figure_teaser():
         S2 = ut.cut(priority_maps[i], w, 2 * w, 0, h)
         T = mt.mixmax(T1, T2, S1, S2, V1, V2, 0, 0.0005)
         transitions.append(T)
-        ut.save(f"t{i}.png", T)
+        ut.save(f"teaser_{i}_{texture_names[i]}_{texture_names[i + 1]}.png", T)
+
 
 def figure_aliasing_artefact_base_variance():
     T1 = ut.load("textures/Brick_T.png")
@@ -61,13 +61,38 @@ def figure_aliasing_artefact_base_variance():
     S2 = ut.cut(S2, 0, 512, 0, 512)
 
     T_without = mt.mixmax(T1, T2, S1, S2, V1, V2, 0, 0)
-    T_with = mt.mixmax(T1, T2, S1, S2, V1, V2, 0, 0.00005)
+    T_with = mt.mixmax(T1, T2, S1, S2, V1, V2, 0, 0.00010)
 
     ut.save("without_base_variance.png", T_without)
     ut.save("with_base_variance.png", T_with)
+    ut.save("without_base_variance_crop.png", ut.cut(T_without, 256, 512, 256, 512))
+    ut.save("with_base_variance_crop.png", ut.cut(T_with, 256, 512, 256, 512))
 
 
+def figure_base_variance_variations():
+    w = 2048
+    h = 512
+    T1 = ut.cut(ut.load("textures/Brick_T.png"), 0, w, 0, h)
+    T2 = ut.cut(ut.load("textures/Sand_T.png"), 0, w, 0, h)
+    S1 = ut.cut(ut.load("textures/Brick_S.png"), 0, w, 0, h)
+    S2 = ut.cut(ut.load("textures/Sand_S.png"), 0, w, 0, h)
+    V1 = np.zeros((h, w, 3))
+    V2 = np.zeros((h, w, 3))
+    for x in range(V1.shape[1]):
+        t = (x / (V1.shape[1] - 1))
+        t = t * 0.4 + 0.3
+        for y in range(V1.shape[0]):
+            for c in range(3):
+                V1[y, x, c] = t
+                V2[y, x, c] = 1 - t
 
+    base_variances = [0.00000, 0.00005, 0.00050, 0.00500, 0.05000]
 
+    for v in base_variances:
+        print("base_variance_" + "{:05d}".format(int(v * 100000)) + ".png")
+        T = mt.mixmax(T1, T2, S1, S2, V1, V2, 0, v)
+        ut.save("base_variance_" + "{:05d}".format(int(v * 100000)) + ".png", T)
 
+#figure_teaser()
 figure_aliasing_artefact_base_variance()
+#figure_base_variance_variations()
