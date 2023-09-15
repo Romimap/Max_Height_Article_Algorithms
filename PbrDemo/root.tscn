@@ -1,4 +1,4 @@
-[gd_scene load_steps=13 format=3 uid="uid://c7l2vgjritbdv"]
+[gd_scene load_steps=16 format=3 uid="uid://c7l2vgjritbdv"]
 
 [ext_resource type="Shader" path="res://mixmaxpbr.gdshader" id="1_0xvvu"]
 [ext_resource type="Texture2D" uid="uid://c3fxremwsxu83" path="res://textures/Rock_BM.png" id="2_wtm7h"]
@@ -9,8 +9,12 @@
 [ext_resource type="Texture2D" uid="uid://b7j6e05htn62h" path="res://textures/Sand_R.png" id="7_il8je"]
 [ext_resource type="Texture2D" uid="uid://bqg0325o8yluf" path="res://textures/Rock_T.png" id="8_nqht1"]
 [ext_resource type="Texture2D" uid="uid://is0flvb61quf" path="res://textures/Sand_T.png" id="9_7y725"]
+[ext_resource type="Script" path="res://scripts/CameraPivot.gd" id="10_fl5ej"]
 
-[sub_resource type="PlaneMesh" id="PlaneMesh_fs3xj"]
+[sub_resource type="PlaneMesh" id="PlaneMesh_ymuof"]
+size = Vector2(1024, 1024)
+subdivide_width = 128
+subdivide_depth = 128
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_k3v5v"]
 render_priority = 0
@@ -25,17 +29,30 @@ shader_parameter/R2 = ExtResource("7_il8je")
 shader_parameter/BM1 = ExtResource("2_wtm7h")
 shader_parameter/BM2 = ExtResource("3_14u1m")
 
+[sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_q3gxv"]
+
+[sub_resource type="Sky" id="Sky_j558q"]
+sky_material = SubResource("ProceduralSkyMaterial_q3gxv")
+
 [sub_resource type="Environment" id="Environment_5xxfs"]
+background_mode = 1
+background_color = Color(0.113725, 0.109804, 0.192157, 1)
+sky = SubResource("Sky_j558q")
 
 [node name="Root" type="Node3D"]
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="."]
-mesh = SubResource("PlaneMesh_fs3xj")
+mesh = SubResource("PlaneMesh_ymuof")
 surface_material_override/0 = SubResource("ShaderMaterial_k3v5v")
-
-[node name="OmniLight3D" type="OmniLight3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.254286, 0)
-light_energy = 0.39
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="."]
 environment = SubResource("Environment_5xxfs")
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 0.973599, 0.228266, 0, -0.228266, 0.973599, 0, -1, 0)
+light_color = Color(0.823529, 0.682353, 0.611765, 1)
+light_energy = 2.0
+
+[node name="Camera3D" type="Camera3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 2)
+script = ExtResource("10_fl5ej")

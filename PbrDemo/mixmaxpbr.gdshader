@@ -45,8 +45,14 @@ float max_priority (vec2 uv, vec2 duvdx, vec2 duvdy) {
 	return w;
 }
 
+float map(float value, float min1, float max1, float min2, float max2) {
+  return min2 + (value - min1) * (max2 - min2) / (max1 - min1);
+}
+
 void vertex() {
-	v = UV.x * 0.4 + 0.3;
+	UV -= 0.5;
+	UV *= 1024.0;
+	v = map(UV.x, -10, 10, 0, 1);
 }
 
 void fragment() {
