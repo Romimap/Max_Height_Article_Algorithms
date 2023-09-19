@@ -69,11 +69,17 @@ vec3 tiling_n_blending(vec2 uv, sampler2D T, sampler2D BM) {
     float mu2 = b2;
     float var2 = m2 - b2 * b2;
     
+	//Exponentiation of the interpolation fields
 	v1 = pow(v1, beta);
 	v2 = pow(v2, beta);
+	float v1e = v1 / (v1 + v2);
+	float v2e = v2 / (v1 + v2);
+	
+	//Symetrisation of the priority map
+	mu2 = -mu2;
 	
 	//filtering approximation
-    float n = (mu2 + v2) - (mu1 + v1);
+    float n = (mu2 + v2e) - (mu1 + v1e);
     float d = clamp(sqrt(var1 + var2 + 2.0 * lambda), 0.01, 1);	
     float w = 1.0 - Phi(n/d);
 
@@ -102,6 +108,5 @@ void vertex() {
 void fragment() {
 	ALBEDO = tiling_n_blending(UV, albedo, bm);
 
-	ALBEDO = ALBEDO * ALBEDO; //Engines shows sqrt(albedo)
 	ROUGHNESS = 1.0;
 }

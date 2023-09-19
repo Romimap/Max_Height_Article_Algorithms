@@ -106,6 +106,5 @@ void vertex() {
 void fragment() {
 	ALBEDO = tiling_n_blending(UV, albedo);
 	
-	ALBEDO = ALBEDO * ALBEDO; //Engines shows sqrt(albedo)
 	ROUGHNESS = 1.0;
 }

@@ -1,4 +1,4 @@
-[gd_scene load_steps=22 format=3 uid="uid://cct5qhv30okj1"]
+[gd_scene load_steps=23 format=3 uid="uid://cct5qhv30okj1"]
 
 [ext_resource type="Script" path="res://scripts/ShaderEditor.gd" id="1_s38sk"]
 [ext_resource type="Texture2D" uid="uid://dkeqxrw5qc6yj" path="res://textures/Forest/icon.png" id="2_8ooqv"]
@@ -16,13 +16,17 @@
 [ext_resource type="Texture2D" uid="uid://cc5t1a7fr0mi7" path="res://textures/Sand/icon.png" id="9_8n0uw"]
 [ext_resource type="Texture2D" uid="uid://ctq2vfopxq3wg" path="res://textures/Wood/icon.png" id="10_f3p5w"]
 [ext_resource type="Texture2D" uid="uid://j2ny1ljiux3t" path="res://textures/Artificial01/icon.png" id="11_jysey"]
+[ext_resource type="Texture2D" uid="uid://c5dx4cehlgm2b" path="res://textures/Forest/BM.png" id="17_a4u2c"]
 
 [sub_resource type="Shader" id="Shader_nvnx3"]
 code = "shader_type spatial;
 
 uniform sampler2D albedo : filter_linear_mipmap_anisotropic;
+uniform sampler2D bm : filter_linear_mipmap_anisotropic;
 uniform float lambda;
+uniform float beta;
 uniform bool printgrid = false;
+uniform vec2 uvoffset;
 
 void fragment() {
 	// Place fragment code here.
@@ -33,8 +37,11 @@ void fragment() {
 render_priority = 0
 shader = SubResource("Shader_nvnx3")
 shader_parameter/lambda = 5.0
+shader_parameter/beta = null
 shader_parameter/printgrid = false
+shader_parameter/uvoffset = null
 shader_parameter/albedo = ExtResource("3_uyfoo")
+shader_parameter/bm = ExtResource("17_a4u2c")
 
 [sub_resource type="PlaneMesh" id="PlaneMesh_yr5da"]
 size = Vector2(128, 128)
@@ -62,15 +69,9 @@ focus_mode = 1
 
 [node name="CodeEdit" type="CodeEdit" parent="UI" node_paths=PackedStringArray("mesh", "shaderSelect", "albedoSelect", "lambdaSlider", "betaSlider", "printGridCheck")]
 layout_mode = 1
-anchors_preset = 11
-anchor_left = 1.0
-anchor_right = 1.0
+anchors_preset = 9
 anchor_bottom = 1.0
-offset_left = -979.0
-offset_top = 5.0
-offset_right = -5.0
-offset_bottom = -6.0
-grow_horizontal = 0
+offset_right = 960.0
 grow_vertical = 2
 highlight_all_occurrences = true
 scroll_smooth = true
@@ -112,12 +113,15 @@ text = "Compile"
 
 [node name="Panel" type="Panel" parent="UI"]
 layout_mode = 1
-anchors_preset = 9
+anchors_preset = 11
+anchor_left = 1.0
+anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = 5.0
-offset_top = 6.0
-offset_right = 216.0
+offset_left = -216.0
+offset_top = 5.0
+offset_right = -5.0
 offset_bottom = -6.0
+grow_horizontal = 0
 grow_vertical = 2
 
 [node name="ScrollContainer" type="ScrollContainer" parent="UI/Panel"]
@@ -261,10 +265,10 @@ text = "albedo
 
 [node name="LambdaSlider" type="HSlider" parent="UI/Panel/ScrollContainer/VBoxContainer"]
 layout_mode = 2
-max_value = 32.0
+min_value = -8.0
+max_value = 8.0
 step = 0.0
 value = 1.0
-exp_edit = true
 
 [node name="RichTextLabel" type="RichTextLabel" parent="UI/Panel/ScrollContainer/VBoxContainer/LambdaSlider"]
 layout_mode = 0
@@ -283,10 +287,10 @@ text = "lambda value"
 
 [node name="BetaSlider" type="HSlider" parent="UI/Panel/ScrollContainer/VBoxContainer"]
 layout_mode = 2
-max_value = 32.0
+min_value = -8.0
+max_value = 8.0
 step = 0.0
 value = 0.6
-exp_edit = true
 
 [node name="RichTextLabel" type="RichTextLabel" parent="UI/Panel/ScrollContainer/VBoxContainer/BetaSlider"]
 layout_mode = 0

@@ -53,6 +53,33 @@ func load_shader (id : int):
 	var shader = ResourceLoader.load("res://shaders/" + name + ".gdshader") as Shader
 	text = shader.code
 	compile ()
+	
+	#presets
+	if name == "b_19" :
+		lambdaSlider.get_node("Label").text = "Exponentiation"
+		lambdaSlider.max_value = 16.0
+		lambdaSlider.min_value = 1.0
+		lambdaSlider.value = 4
+	if name == "m_22" :
+		lambdaSlider.get_node("Label").text = "Exponentiation"
+		lambdaSlider.max_value = 16.0
+		lambdaSlider.min_value = 1.0
+		lambdaSlider.value = 7
+		betaSlider.get_node("Label").text = "Metric weight"
+		betaSlider.max_value = 1.0
+		betaSlider.min_value = 0.0
+		betaSlider.value = 0.3
+		
+	if name == "ours" :
+		lambdaSlider.get_node("Label").text = "Base variance"
+		lambdaSlider.max_value = 1.0
+		lambdaSlider.min_value = 0.0
+		lambdaSlider.value = 0
+		betaSlider.get_node("Label").text = "Exponentiation"
+		betaSlider.max_value = 8.0
+		betaSlider.min_value = 0.0
+		betaSlider.value = 0.3
+	
 
 # Called on "Compile" input
 # Compiles the shader in the text editor
@@ -76,7 +103,6 @@ func set_lambda(t : float):
 
 func set_beta(t : float):
 	shaderMat.set_shader_parameter("beta", t)
-
 
 #Called on "PrintGridCheck" input
 func set_printgrid(b : bool):

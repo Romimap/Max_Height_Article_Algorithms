@@ -12,6 +12,5 @@ void vertex() {
 void fragment() {
 	ALBEDO = texture(albedo, UV).rgb;
 
-	ALBEDO = ALBEDO * ALBEDO; //Engines shows sqrt(albedo)
 	ROUGHNESS = 1.0;
 }

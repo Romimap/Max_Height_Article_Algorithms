@@ -53,7 +53,7 @@ void TriangleGrid(in vec2 p_uv, inout vec3 Bi, inout ivec2 vertex1, inout ivec2 
 }
 
 float metric(vec3 c) {
-	return 1.0 - beta + beta * (c.r * 0.299 + c.g * 0.587 + c.b * 0.114);
+	return (1.0 - beta) + (beta * (c.r * 0.299 + c.g * 0.587 + c.b * 0.114));
 }
 
 vec3 hex_tiling(vec2 uv, sampler2D tex) {
@@ -108,6 +108,5 @@ void vertex() {
 void fragment() {
 	ALBEDO = hex_tiling(UV, albedo);
 
-	ALBEDO = ALBEDO * ALBEDO; //Engines shows sqrt(albedo)
 	ROUGHNESS = 1.0;
 }
