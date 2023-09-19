@@ -12,7 +12,11 @@ uniform sampler2D R2 : filter_linear_mipmap_anisotropic;
 uniform sampler2D BM1 : filter_linear_mipmap_anisotropic;
 uniform sampler2D BM2 : filter_linear_mipmap_anisotropic;
 
-uniform float lambda : hint_range(-0.001, 0.1, 0.0001) = 1.0; 
+uniform float lambda : hint_range(0, 1.0, 0.0001) = 1.0; 
+uniform float range = 10.0;
+
+uniform vec4 sand_tint = vec4(0);
+uniform vec4 rocks_tint = vec4(0);
 
 varying float v;
 
@@ -34,7 +38,7 @@ float max_priority (vec2 uv, vec2 duvdx, vec2 duvdy) {
 	float mu2 = b2;
 	float var2 = m2 - b2 * b2;
 	
-	float v2 = clamp(v, 0, 1);
+	float v2 = v;
 	float v1 = 1.0 - v2;
 	
 	float n = (mu2 + v2) - (mu1 + v1);
@@ -52,7 +56,7 @@ float map(float value, float min1, float max1, float min2, float max2) {
 void vertex() {
 	UV -= 0.5;
 	UV *= 1024.0;
-	v = map(UV.x, -10, 10, 0, 1);
+	v = map(UV.x, -range, range, 0, 1);
 }
 
 void fragment() {
@@ -65,7 +69,7 @@ void fragment() {
 	float r1 = textureGrad(R1, UV, dFdx(UV), dFdy(UV)).x;
 	float r2 = textureGrad(R2, UV, dFdx(UV), dFdy(UV)).x;
 	
-	ALBEDO = mix(t2 * vec3(0.9, 0.4, 0.3), t1 * vec3(0.3, 0.3, 0.4), w);
+	ALBEDO = mix(t2 * sand_tint.rgb, t1 * rocks_tint.rgb, w);
 	NORMAL_MAP = normalize(mix(n2, n1, w));
 	ROUGHNESS = mix(r2, r1, w);
 }

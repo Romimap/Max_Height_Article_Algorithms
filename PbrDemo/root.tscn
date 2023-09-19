@@ -1,4 +1,4 @@
-[gd_scene load_steps=16 format=3 uid="uid://c7l2vgjritbdv"]
+[gd_scene load_steps=21 format=3 uid="uid://c7l2vgjritbdv"]
 
 [ext_resource type="Shader" path="res://mixmaxpbr.gdshader" id="1_0xvvu"]
 [ext_resource type="Texture2D" uid="uid://c3fxremwsxu83" path="res://textures/Rock_BM.png" id="2_wtm7h"]
@@ -10,6 +10,8 @@
 [ext_resource type="Texture2D" uid="uid://bqg0325o8yluf" path="res://textures/Rock_T.png" id="8_nqht1"]
 [ext_resource type="Texture2D" uid="uid://is0flvb61quf" path="res://textures/Sand_T.png" id="9_7y725"]
 [ext_resource type="Script" path="res://scripts/CameraPivot.gd" id="10_fl5ej"]
+[ext_resource type="Script" path="res://scripts/shaderController.gd" id="10_xnbbg"]
+[ext_resource type="Script" path="res://scripts/sunController.gd" id="11_fx2eh"]
 
 [sub_resource type="PlaneMesh" id="PlaneMesh_ymuof"]
 size = Vector2(1024, 1024)
@@ -19,7 +21,10 @@ subdivide_depth = 128
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_k3v5v"]
 render_priority = 0
 shader = ExtResource("1_0xvvu")
-shader_parameter/lambda = 0.0104
+shader_parameter/lambda = 0.0
+shader_parameter/range = 12.5
+shader_parameter/sand_tint = Vector4(0, 0, 0, 0)
+shader_parameter/rocks_tint = Vector4(0, 0, 0, 0)
 shader_parameter/T1 = ExtResource("8_nqht1")
 shader_parameter/T2 = ExtResource("9_7y725")
 shader_parameter/N1 = ExtResource("4_8cgdf")
@@ -29,30 +34,173 @@ shader_parameter/R2 = ExtResource("7_il8je")
 shader_parameter/BM1 = ExtResource("2_wtm7h")
 shader_parameter/BM2 = ExtResource("3_14u1m")
 
-[sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_q3gxv"]
+[sub_resource type="PhysicalSkyMaterial" id="PhysicalSkyMaterial_d7ads"]
+energy_multiplier = 3.0
 
 [sub_resource type="Sky" id="Sky_j558q"]
-sky_material = SubResource("ProceduralSkyMaterial_q3gxv")
+sky_material = SubResource("PhysicalSkyMaterial_d7ads")
 
 [sub_resource type="Environment" id="Environment_5xxfs"]
-background_mode = 1
+background_mode = 2
 background_color = Color(0.113725, 0.109804, 0.192157, 1)
 sky = SubResource("Sky_j558q")
+fog_light_color = Color(0.458717, 0.470436, 0.478248, 1)
+fog_sun_scatter = 0.07
+fog_density = 0.0285
+fog_sky_affect = 0.0
+volumetric_fog_enabled = true
+volumetric_fog_density = 0.02
+volumetric_fog_anisotropy = 0.4
+volumetric_fog_length = 1024.0
+volumetric_fog_ambient_inject = 1.0
+
+[sub_resource type="Gradient" id="Gradient_offhh"]
+offsets = PackedFloat32Array(0, 0.0769231, 0.213018, 1)
+colors = PackedColorArray(0, 0, 0, 1, 0.545907, 0.407102, 0.34865, 1, 0.909029, 0.828534, 0.788909, 1, 1, 1, 1, 1)
+
+[sub_resource type="GradientTexture1D" id="GradientTexture1D_dtgus"]
+gradient = SubResource("Gradient_offhh")
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_yve0d"]
 
 [node name="Root" type="Node3D"]
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="."]
 mesh = SubResource("PlaneMesh_ymuof")
 surface_material_override/0 = SubResource("ShaderMaterial_k3v5v")
+script = ExtResource("10_xnbbg")
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="."]
 environment = SubResource("Environment_5xxfs")
 
 [node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 0.973599, 0.228266, 0, -0.228266, 0.973599, 0, -1, 0)
+transform = Transform3D(1, 0, 0, 0, 0.984808, 0.173648, 0, -0.173648, 0.984808, 0, -1, 0)
 light_color = Color(0.823529, 0.682353, 0.611765, 1)
 light_energy = 2.0
+script = ExtResource("11_fx2eh")
+suncolor = SubResource("GradientTexture1D_dtgus")
 
 [node name="Camera3D" type="Camera3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 2)
 script = ExtResource("10_fl5ej")
+
+[node name="Control" type="Control" parent="."]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Panel" type="Panel" parent="Control"]
+layout_mode = 1
+anchors_preset = 11
+anchor_left = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -175.0
+offset_top = 2.0
+offset_right = -2.0
+offset_bottom = -2.0
+grow_horizontal = 0
+grow_vertical = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Control/Panel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 5.0
+offset_top = 5.0
+offset_right = -5.0
+offset_bottom = -5.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="HSeparator" type="HSeparator" parent="Control/Panel/VBoxContainer"]
+layout_mode = 2
+theme_override_constants/separation = 10
+theme_override_styles/separator = SubResource("StyleBoxEmpty_yve0d")
+
+[node name="RichTextLabel" type="RichTextLabel" parent="Control/Panel/VBoxContainer"]
+layout_mode = 2
+bbcode_enabled = true
+text = "[center]Base variance"
+fit_content = true
+
+[node name="HSlider" type="HSlider" parent="Control/Panel/VBoxContainer"]
+layout_mode = 2
+max_value = 1.0
+step = 0.0
+
+[node name="RichTextLabel2" type="RichTextLabel" parent="Control/Panel/VBoxContainer"]
+layout_mode = 2
+bbcode_enabled = true
+text = "[center]Mixing range"
+fit_content = true
+
+[node name="HSlider2" type="HSlider" parent="Control/Panel/VBoxContainer"]
+layout_mode = 2
+min_value = 0.001
+max_value = 1.0
+step = 0.0
+value = 0.5
+
+[node name="RichTextLabel3" type="RichTextLabel" parent="Control/Panel/VBoxContainer"]
+layout_mode = 2
+bbcode_enabled = true
+text = "[center]Sun azimuth"
+fit_content = true
+
+[node name="HSlider3" type="HSlider" parent="Control/Panel/VBoxContainer"]
+layout_mode = 2
+min_value = -180.0
+max_value = 180.0
+step = 0.0
+
+[node name="RichTextLabel4" type="RichTextLabel" parent="Control/Panel/VBoxContainer"]
+layout_mode = 2
+bbcode_enabled = true
+text = "[center]Sun elevation
+"
+fit_content = true
+
+[node name="HSlider4" type="HSlider" parent="Control/Panel/VBoxContainer"]
+layout_mode = 2
+min_value = -45.0
+max_value = -5.0
+step = 0.0
+value = -35.0
+
+[node name="RichTextLabel5" type="RichTextLabel" parent="Control/Panel/VBoxContainer"]
+layout_mode = 2
+bbcode_enabled = true
+text = "[center]Sand tint
+"
+fit_content = true
+
+[node name="ColorPickerButton" type="ColorPickerButton" parent="Control/Panel/VBoxContainer"]
+layout_mode = 2
+text = "S"
+color = Color(0.803922, 0.517647, 0.392157, 1)
+
+[node name="RichTextLabel6" type="RichTextLabel" parent="Control/Panel/VBoxContainer"]
+layout_mode = 2
+bbcode_enabled = true
+text = "[center]Rocks tint
+"
+fit_content = true
+
+[node name="ColorPickerButton2" type="ColorPickerButton" parent="Control/Panel/VBoxContainer"]
+layout_mode = 2
+text = "S"
+color = Color(0.34902, 0.403922, 0.47451, 1)
+
+[connection signal="mouse_entered" from="Control" to="Camera3D" method="_on_control_mouse_entered"]
+[connection signal="mouse_exited" from="Control" to="Camera3D" method="_on_control_mouse_exited"]
+[connection signal="value_changed" from="Control/Panel/VBoxContainer/HSlider" to="MeshInstance3D" method="_base_variance_changed"]
+[connection signal="value_changed" from="Control/Panel/VBoxContainer/HSlider2" to="MeshInstance3D" method="_mixing_range_changed"]
+[connection signal="value_changed" from="Control/Panel/VBoxContainer/HSlider3" to="DirectionalLight3D" method="_sun_azimuth_changed"]
+[connection signal="value_changed" from="Control/Panel/VBoxContainer/HSlider4" to="DirectionalLight3D" method="_sun_elevation_changed"]
+[connection signal="color_changed" from="Control/Panel/VBoxContainer/ColorPickerButton" to="MeshInstance3D" method="_sand_tint_changed"]
+[connection signal="color_changed" from="Control/Panel/VBoxContainer/ColorPickerButton2" to="MeshInstance3D" method="_rocks_tint_changed"]

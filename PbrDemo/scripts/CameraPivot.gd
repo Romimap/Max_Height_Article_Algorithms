@@ -3,19 +3,24 @@ extends Node3D
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
+	
 	pass # Replace with function body.
 
 
 var dragging := false
-var azimuth := 0.0
-var elevation := 1.0
+var azimuth := PI
+var elevation := -PI*0.3
 var distance := 2.0
 
 func _input(event):
 	if event is InputEventMouseButton:
 		event = event as InputEventMouseButton
-		if event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
-			dragging = event.pressed
+		
+		if event.button_index == MOUSE_BUTTON_LEFT and event.pressed and lock:
+			dragging = true
+		elif event.button_index == MOUSE_BUTTON_LEFT and not event.pressed:
+			dragging = false
+		
 		if event.button_index == MOUSE_BUTTON_WHEEL_DOWN:
 			distance += 0.1
 		if event.button_index == MOUSE_BUTTON_WHEEL_UP:
@@ -39,3 +44,12 @@ func _process(delta):
 	rotate_y(azimuth)
 	translate_object_local(Vector3(0, 0, distance))
 	pass
+
+
+var lock = false
+func _on_control_mouse_entered():
+	lock = true
+
+func _on_control_mouse_exited():
+	lock = false
+
