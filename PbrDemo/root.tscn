@@ -1,4 +1,4 @@
-[gd_scene load_steps=21 format=3 uid="uid://c7l2vgjritbdv"]
+[gd_scene load_steps=31 format=3 uid="uid://c7l2vgjritbdv"]
 
 [ext_resource type="Shader" path="res://mixmaxpbr.gdshader" id="1_0xvvu"]
 [ext_resource type="Texture2D" uid="uid://c3fxremwsxu83" path="res://textures/Rock_BM.png" id="2_wtm7h"]
@@ -12,19 +12,50 @@
 [ext_resource type="Script" path="res://scripts/CameraPivot.gd" id="10_fl5ej"]
 [ext_resource type="Script" path="res://scripts/shaderController.gd" id="10_xnbbg"]
 [ext_resource type="Script" path="res://scripts/sunController.gd" id="11_fx2eh"]
+[ext_resource type="Script" path="res://scripts/animationmanager.gd" id="13_vdiw5"]
 
 [sub_resource type="PlaneMesh" id="PlaneMesh_ymuof"]
-size = Vector2(1024, 1024)
-subdivide_width = 128
-subdivide_depth = 128
+custom_aabb = AABB(-256, -256, -256, 512, 512, 512)
+size = Vector2(256, 256)
+subdivide_width = 2048
+subdivide_depth = 2048
+
+[sub_resource type="Gradient" id="Gradient_qlds6"]
+interpolation_mode = 2
+offsets = PackedFloat32Array(0, 0.350365, 0.708029, 1)
+colors = PackedColorArray(0, 0, 0, 1, 0.389287, 0.389287, 0.389287, 1, 0.902205, 0.902205, 0.902205, 1, 1, 1, 1, 1)
+
+[sub_resource type="GradientTexture1D" id="GradientTexture1D_vkklr"]
+gradient = SubResource("Gradient_qlds6")
+
+[sub_resource type="Gradient" id="Gradient_t1cjl"]
+offsets = PackedFloat32Array(0, 0.408759, 0.722628, 1)
+colors = PackedColorArray(0, 0, 0, 1, 0.255991, 0.255991, 0.255991, 1, 0.817518, 0.817518, 0.817518, 1, 1, 1, 1, 1)
+
+[sub_resource type="FastNoiseLite" id="FastNoiseLite_q20pg"]
+noise_type = 3
+seed = 9
+frequency = 0.005
+fractal_type = 3
+fractal_octaves = 7
+fractal_gain = 0.52
+
+[sub_resource type="NoiseTexture2D" id="NoiseTexture2D_3wj3j"]
+width = 2048
+height = 2048
+seamless = true
+color_ramp = SubResource("Gradient_t1cjl")
+noise = SubResource("FastNoiseLite_q20pg")
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_k3v5v"]
 render_priority = 0
 shader = ExtResource("1_0xvvu")
-shader_parameter/lambda = 0.0
-shader_parameter/range = 12.5
-shader_parameter/sand_tint = Vector4(0, 0, 0, 0)
-shader_parameter/rocks_tint = Vector4(0, 0, 0, 0)
+shader_parameter/lambda = 0.02
+shader_parameter/range = 7.51
+shader_parameter/sand_tint = Color(0.921569, 0.815686, 0.658824, 1)
+shader_parameter/rocks_tint = Color(0.537255, 0.67451, 0.701961, 1)
+shader_parameter/noise = SubResource("NoiseTexture2D_3wj3j")
+shader_parameter/height_transformation = SubResource("GradientTexture1D_vkklr")
 shader_parameter/T1 = ExtResource("8_nqht1")
 shader_parameter/T2 = ExtResource("9_7y725")
 shader_parameter/N1 = ExtResource("4_8cgdf")
@@ -34,25 +65,31 @@ shader_parameter/R2 = ExtResource("7_il8je")
 shader_parameter/BM1 = ExtResource("2_wtm7h")
 shader_parameter/BM2 = ExtResource("3_14u1m")
 
-[sub_resource type="PhysicalSkyMaterial" id="PhysicalSkyMaterial_d7ads"]
-energy_multiplier = 3.0
+[sub_resource type="PhysicalSkyMaterial" id="PhysicalSkyMaterial_v6xi2"]
+ground_color = Color(1, 1, 1, 1)
+energy_multiplier = 2.5
 
-[sub_resource type="Sky" id="Sky_j558q"]
-sky_material = SubResource("PhysicalSkyMaterial_d7ads")
+[sub_resource type="Sky" id="Sky_bpnom"]
+sky_material = SubResource("PhysicalSkyMaterial_v6xi2")
 
 [sub_resource type="Environment" id="Environment_5xxfs"]
 background_mode = 2
 background_color = Color(0.113725, 0.109804, 0.192157, 1)
-sky = SubResource("Sky_j558q")
-fog_light_color = Color(0.458717, 0.470436, 0.478248, 1)
-fog_sun_scatter = 0.07
-fog_density = 0.0285
-fog_sky_affect = 0.0
-volumetric_fog_enabled = true
-volumetric_fog_density = 0.02
+sky = SubResource("Sky_bpnom")
+ambient_light_source = 3
+ambient_light_sky_contribution = 0.3
+tonemap_exposure = 2.0
+fog_light_color = Color(0.517647, 0.552941, 0.607843, 1)
+fog_sun_scatter = 0.14
+fog_density = 0.005
+fog_aerial_perspective = 1.0
+volumetric_fog_density = 0.04
 volumetric_fog_anisotropy = 0.4
-volumetric_fog_length = 1024.0
+volumetric_fog_length = 256.0
 volumetric_fog_ambient_inject = 1.0
+volumetric_fog_temporal_reprojection_enabled = false
+
+[sub_resource type="CameraAttributesPractical" id="CameraAttributesPractical_x1ri5"]
 
 [sub_resource type="Gradient" id="Gradient_offhh"]
 offsets = PackedFloat32Array(0, 0.0769231, 0.213018, 1)
@@ -61,22 +98,112 @@ colors = PackedColorArray(0, 0, 0, 1, 0.545907, 0.407102, 0.34865, 1, 0.909029, 
 [sub_resource type="GradientTexture1D" id="GradientTexture1D_dtgus"]
 gradient = SubResource("Gradient_offhh")
 
+[sub_resource type="Animation" id="Animation_q0prx"]
+resource_name = "animate"
+length = 12.0
+loop_mode = 1
+step = 0.5
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Control/Panel/VBoxContainer/basevariance:value")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 5.5, 6, 7.5, 8, 11.5),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1),
+"update": 0,
+"values": [0.3, 0.3, 0.7, 0.7, 0.3, 0.3]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Control/Panel/VBoxContainer/mixingrange:value")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0, 3.5, 4, 7.5, 8, 11.5),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1),
+"update": 0,
+"values": [0.25, 0.25, 0.5, 0.5, 0.25, 0.25]
+}
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath("Control/Panel/VBoxContainer/azimuth:value")
+tracks/2/interp = 2
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0, 2, 3.5, 8, 9.5, 11.5),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1),
+"update": 0,
+"values": [25.0, 90.0, 90.0, 90.0, 90.0, 25.0]
+}
+tracks/3/type = "value"
+tracks/3/imported = false
+tracks/3/enabled = true
+tracks/3/path = NodePath("Control/Panel/VBoxContainer/elevation:value")
+tracks/3/interp = 2
+tracks/3/loop_wrap = true
+tracks/3/keys = {
+"times": PackedFloat32Array(0, 2, 3.5, 8, 9.5, 11.5),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1),
+"update": 0,
+"values": [-10.0, -45.0, -45.0, -45.0, -45.0, -10.0]
+}
+
+[sub_resource type="Animation" id="Animation_c3tmb"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Control/Panel/VBoxContainer/basevariance:value")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [0.3]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Control/Panel/VBoxContainer/mixingrange:value")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [0.25]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_4q4yt"]
+_data = {
+"RESET": SubResource("Animation_c3tmb"),
+"animate": SubResource("Animation_q0prx")
+}
+
 [sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_yve0d"]
 
 [node name="Root" type="Node3D"]
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3, 2, 1)
 mesh = SubResource("PlaneMesh_ymuof")
 surface_material_override/0 = SubResource("ShaderMaterial_k3v5v")
 script = ExtResource("10_xnbbg")
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="."]
 environment = SubResource("Environment_5xxfs")
+camera_attributes = SubResource("CameraAttributesPractical_x1ri5")
 
 [node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 0.984808, 0.173648, 0, -0.173648, 0.984808, 0, -1, 0)
+transform = Transform3D(0.181254, -0.245257, 0.952363, -0.104647, 0.958096, 0.266649, -0.977853, -0.147993, 0.147993, 0, -1, 0)
 light_color = Color(0.823529, 0.682353, 0.611765, 1)
 light_energy = 2.0
+shadow_enabled = true
 script = ExtResource("11_fx2eh")
 suncolor = SubResource("GradientTexture1D_dtgus")
 
@@ -105,6 +232,13 @@ offset_bottom = -2.0
 grow_horizontal = 0
 grow_vertical = 2
 
+[node name="AnimationPlayer" type="AnimationPlayer" parent="Control/Panel"]
+root_node = NodePath("../../..")
+libraries = {
+"": SubResource("AnimationLibrary_4q4yt")
+}
+script = ExtResource("13_vdiw5")
+
 [node name="VBoxContainer" type="VBoxContainer" parent="Control/Panel"]
 layout_mode = 1
 anchors_preset = 15
@@ -128,10 +262,11 @@ bbcode_enabled = true
 text = "[center]Base variance"
 fit_content = true
 
-[node name="HSlider" type="HSlider" parent="Control/Panel/VBoxContainer"]
+[node name="basevariance" type="HSlider" parent="Control/Panel/VBoxContainer"]
 layout_mode = 2
 max_value = 1.0
 step = 0.0
+value = 0.3
 
 [node name="RichTextLabel2" type="RichTextLabel" parent="Control/Panel/VBoxContainer"]
 layout_mode = 2
@@ -139,12 +274,12 @@ bbcode_enabled = true
 text = "[center]Mixing range"
 fit_content = true
 
-[node name="HSlider2" type="HSlider" parent="Control/Panel/VBoxContainer"]
+[node name="mixingrange" type="HSlider" parent="Control/Panel/VBoxContainer"]
 layout_mode = 2
-min_value = 0.001
+min_value = 0.01
 max_value = 1.0
 step = 0.0
-value = 0.5
+value = 0.25
 
 [node name="RichTextLabel3" type="RichTextLabel" parent="Control/Panel/VBoxContainer"]
 layout_mode = 2
@@ -152,11 +287,12 @@ bbcode_enabled = true
 text = "[center]Sun azimuth"
 fit_content = true
 
-[node name="HSlider3" type="HSlider" parent="Control/Panel/VBoxContainer"]
+[node name="azimuth" type="HSlider" parent="Control/Panel/VBoxContainer"]
 layout_mode = 2
 min_value = -180.0
 max_value = 180.0
 step = 0.0
+value = 25.0
 
 [node name="RichTextLabel4" type="RichTextLabel" parent="Control/Panel/VBoxContainer"]
 layout_mode = 2
@@ -165,12 +301,12 @@ text = "[center]Sun elevation
 "
 fit_content = true
 
-[node name="HSlider4" type="HSlider" parent="Control/Panel/VBoxContainer"]
+[node name="elevation" type="HSlider" parent="Control/Panel/VBoxContainer"]
 layout_mode = 2
 min_value = -45.0
 max_value = -5.0
 step = 0.0
-value = -35.0
+value = -10.0
 
 [node name="RichTextLabel5" type="RichTextLabel" parent="Control/Panel/VBoxContainer"]
 layout_mode = 2
@@ -182,7 +318,7 @@ fit_content = true
 [node name="ColorPickerButton" type="ColorPickerButton" parent="Control/Panel/VBoxContainer"]
 layout_mode = 2
 text = "S"
-color = Color(0.803922, 0.517647, 0.392157, 1)
+color = Color(0.835294, 0.752941, 0.713726, 1)
 
 [node name="RichTextLabel6" type="RichTextLabel" parent="Control/Panel/VBoxContainer"]
 layout_mode = 2
@@ -194,13 +330,18 @@ fit_content = true
 [node name="ColorPickerButton2" type="ColorPickerButton" parent="Control/Panel/VBoxContainer"]
 layout_mode = 2
 text = "S"
-color = Color(0.34902, 0.403922, 0.47451, 1)
+color = Color(0.356863, 0.384314, 0.423529, 1)
+
+[node name="CheckButton" type="CheckButton" parent="Control/Panel/VBoxContainer"]
+layout_mode = 2
+text = "Animate"
 
 [connection signal="mouse_entered" from="Control" to="Camera3D" method="_on_control_mouse_entered"]
 [connection signal="mouse_exited" from="Control" to="Camera3D" method="_on_control_mouse_exited"]
-[connection signal="value_changed" from="Control/Panel/VBoxContainer/HSlider" to="MeshInstance3D" method="_base_variance_changed"]
-[connection signal="value_changed" from="Control/Panel/VBoxContainer/HSlider2" to="MeshInstance3D" method="_mixing_range_changed"]
-[connection signal="value_changed" from="Control/Panel/VBoxContainer/HSlider3" to="DirectionalLight3D" method="_sun_azimuth_changed"]
-[connection signal="value_changed" from="Control/Panel/VBoxContainer/HSlider4" to="DirectionalLight3D" method="_sun_elevation_changed"]
+[connection signal="value_changed" from="Control/Panel/VBoxContainer/basevariance" to="MeshInstance3D" method="_base_variance_changed"]
+[connection signal="value_changed" from="Control/Panel/VBoxContainer/mixingrange" to="MeshInstance3D" method="_mixing_range_changed"]
+[connection signal="value_changed" from="Control/Panel/VBoxContainer/azimuth" to="DirectionalLight3D" method="_sun_azimuth_changed"]
+[connection signal="value_changed" from="Control/Panel/VBoxContainer/elevation" to="DirectionalLight3D" method="_sun_elevation_changed"]
 [connection signal="color_changed" from="Control/Panel/VBoxContainer/ColorPickerButton" to="MeshInstance3D" method="_sand_tint_changed"]
 [connection signal="color_changed" from="Control/Panel/VBoxContainer/ColorPickerButton2" to="MeshInstance3D" method="_rocks_tint_changed"]
+[connection signal="toggled" from="Control/Panel/VBoxContainer/CheckButton" to="Control/Panel/AnimationPlayer" method="_play"]

@@ -3,7 +3,8 @@ extends DirectionalLight3D
 @export var suncolor : GradientTexture1D
 
 func _ready():
-	_sun_elevation_changed(-35)
+	_sun_azimuth_changed(get_node("/root/Root/Control/Panel/VBoxContainer/azimuth").value)
+	_sun_elevation_changed(get_node("/root/Root/Control/Panel/VBoxContainer/elevation").value)
 
 func _sun_azimuth_changed(value):
 	var d := rotation_degrees

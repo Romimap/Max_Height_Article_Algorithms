@@ -1,5 +1,8 @@
 shader_type spatial;
 
+uniform sampler2D noise : filter_linear_mipmap_anisotropic;
+uniform sampler2D height_transformation : filter_linear_mipmap_anisotropic;
+
 uniform sampler2D T1 : filter_linear_mipmap_anisotropic;
 uniform sampler2D T2 : filter_linear_mipmap_anisotropic;
 
@@ -12,13 +15,48 @@ uniform sampler2D R2 : filter_linear_mipmap_anisotropic;
 uniform sampler2D BM1 : filter_linear_mipmap_anisotropic;
 uniform sampler2D BM2 : filter_linear_mipmap_anisotropic;
 
-uniform float lambda : hint_range(0, 1.0, 0.0001) = 1.0; 
+uniform float lambda : hint_range(0.0, 1.0, 0.0001) = 0.0; 
 uniform float range = 10.0;
 
-uniform vec4 sand_tint = vec4(0);
-uniform vec4 rocks_tint = vec4(0);
+uniform vec4 sand_tint : source_color = vec4(0);
+uniform vec4 rocks_tint : source_color = vec4(0);
 
 varying float v;
+
+
+float getNoise(vec2 uv, int octaves) {
+	return -texture(noise, uv).r * 2.0 + 1.0;
+}
+
+float getHeight(vec2 uv) {
+	float h = (-getNoise(uv, 2) + 0.5) * 0.3;
+	
+	return h - 2.2;
+}
+
+vec3 calc_normal(vec2 uv) { 
+    const vec3 off = vec3(-1,0,1);
+    vec2 texelSize = vec2(1.0 / 2048.0);
+
+    float left = getHeight(uv + texelSize * off.xy);
+    float right = getHeight(uv + texelSize * off.zy);
+    float top = getHeight(uv + texelSize * off.yx);
+    float down = getHeight(uv + texelSize * off.yz);
+
+    return normalize(vec3(left-right, 0.2, top-down));
+}
+
+void vertex() {
+	float d = 256.0/2048.0;
+	vec2 uv = UV;
+	
+	v = (getNoise(UV, 2) - 0.5) * range + 0.5;
+	
+	UV -= 0.5;
+	UV *= 1024.0;
+	VERTEX.y = getHeight(uv);
+	NORMAL = calc_normal(uv);
+}
 
 //Approx for the cumulative standard normal distribution
 float Phi (float x) {
@@ -26,17 +64,14 @@ float Phi (float x) {
 }
 
 float max_priority (vec2 uv, vec2 duvdx, vec2 duvdy) {
-	float b1 = textureGrad(BM1, uv, duvdx, duvdy).r - 0.5;
-	float m1 = textureGrad(BM1, uv, duvdx, duvdy).g - 0.5;
+	vec2 bm1 = textureGrad(BM1, uv, duvdx, duvdy).rg - 0.5;
+	vec2 bm2 = textureGrad(BM2, uv, duvdx, duvdy).rg - 0.5;
 	
-	float b2 = textureGrad(BM2, uv, duvdx, duvdy).r - 0.5;
-	float m2 = textureGrad(BM2, uv, duvdx, duvdy).g - 0.5;
+	float mu1 = bm1.x;
+	float var1 = bm1.y - bm1.x * bm1.x;
 	
-	float mu1 = b1;
-	float var1 = m1 - b1 * b1;
-	
-	float mu2 = b2;
-	float var2 = m2 - b2 * b2;
+	float mu2 = bm2.x;
+	float var2 = bm2.y - bm2.x * bm2.x;
 	
 	float v2 = v;
 	float v1 = 1.0 - v2;
@@ -47,16 +82,6 @@ float max_priority (vec2 uv, vec2 duvdx, vec2 duvdy) {
 	float w = 1.0 - Phi(n/d);
 	
 	return w;
-}
-
-float map(float value, float min1, float max1, float min2, float max2) {
-  return min2 + (value - min1) * (max2 - min2) / (max1 - min1);
-}
-
-void vertex() {
-	UV -= 0.5;
-	UV *= 1024.0;
-	v = map(UV.x, -range, range, 0, 1);
 }
 
 void fragment() {
@@ -71,5 +96,5 @@ void fragment() {
 	
 	ALBEDO = mix(t2 * sand_tint.rgb, t1 * rocks_tint.rgb, w);
 	NORMAL_MAP = normalize(mix(n2, n1, w));
-	ROUGHNESS = mix(r2, r1, w);
+	ROUGHNESS = mix(r2, r1 + 0.1, w);
 }
