@@ -1,0 +1,35 @@
+[gd_scene load_steps=5 format=3 uid="uid://ci537dr8midg7"]
+
+[ext_resource type="Shader" path="res://shaders/stationnarity.gdshader" id="1_8yjys"]
+[ext_resource type="Script" path="res://screenshot.gd" id="1_mdypo"]
+[ext_resource type="Texture2D" uid="uid://rcahwh0rk4x6" path="res://textures/T.png" id="2_sqjct"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_wvb76"]
+shader = ExtResource("1_8yjys")
+shader_parameter/exponentiation = 1.5
+shader_parameter/lambda = 0.05
+shader_parameter/mask = false
+shader_parameter/symetrisation = true
+shader_parameter/T = ExtResource("2_sqjct")
+
+[node name="Control" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Control" type="Control" parent="."]
+anchors_preset = 0
+offset_right = 40.0
+offset_bottom = 40.0
+scale = Vector2(3, 3)
+script = ExtResource("1_mdypo")
+path = "stat_w_sym.png"
+
+[node name="ColorRect" type="ColorRect" parent="Control"]
+material = SubResource("ShaderMaterial_wvb76")
+layout_mode = 0
+offset_right = 512.0
+offset_bottom = 256.0

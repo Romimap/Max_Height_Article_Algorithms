@@ -1,0 +1,88 @@
+[gd_scene load_steps=13 format=3 uid="uid://dh65nl1i2f0f4"]
+
+[ext_resource type="Script" path="res://screenshot.gd" id="1_epqq4"]
+[ext_resource type="Shader" path="res://shaders/exemplar.gdshader" id="2_7uhxp"]
+[ext_resource type="Texture2D" uid="uid://cehmla2apwhs7" path="res://textures/S1.jpg" id="3_2myky"]
+[ext_resource type="Texture2D" uid="uid://d125y87wqdays" path="res://textures/T1.png" id="4_g12os"]
+[ext_resource type="Texture2D" uid="uid://bt3rb0cfa7wqp" path="res://textures/S2.jpg" id="5_sgwwk"]
+[ext_resource type="Texture2D" uid="uid://gneun7l4ni4e" path="res://textures/T2.png" id="6_r8cgi"]
+[ext_resource type="Shader" path="res://shaders/linear.gdshader" id="7_l7d1f"]
+[ext_resource type="Shader" path="res://shaders/mixmax.gdshader" id="8_67h0h"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_b3fcn"]
+shader = ExtResource("2_7uhxp")
+shader_parameter/T = ExtResource("4_g12os")
+shader_parameter/S = ExtResource("3_2myky")
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_6p2t7"]
+shader = ExtResource("2_7uhxp")
+shader_parameter/T = ExtResource("6_r8cgi")
+shader_parameter/S = ExtResource("5_sgwwk")
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_kdsl2"]
+shader = ExtResource("7_l7d1f")
+shader_parameter/T1 = ExtResource("4_g12os")
+shader_parameter/T2 = ExtResource("6_r8cgi")
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_ty3jg"]
+shader = ExtResource("8_67h0h")
+shader_parameter/lambda = 0.006
+shader_parameter/T1 = ExtResource("4_g12os")
+shader_parameter/T2 = ExtResource("6_r8cgi")
+shader_parameter/S1 = ExtResource("3_2myky")
+shader_parameter/S2 = ExtResource("5_sgwwk")
+
+[node name="Control" type="Control"]
+layout_mode = 3
+anchors_preset = 0
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="Control" type="Control" parent="."]
+layout_mode = 3
+anchors_preset = 0
+offset_left = 1.0
+offset_top = 1027.0
+offset_right = 514.0
+offset_bottom = 1654.0
+rotation = -1.5708
+scale = Vector2(2, 2)
+script = ExtResource("1_epqq4")
+
+[node name="ColorRect" type="ColorRect" parent="Control"]
+layout_mode = 1
+offset_left = -1.0
+offset_top = -1.0
+offset_right = 514.0
+offset_bottom = 628.0
+color = Color(0, 0, 0, 1)
+
+[node name="T1S1" type="ColorRect" parent="Control"]
+material = SubResource("ShaderMaterial_b3fcn")
+layout_mode = 0
+offset_left = -6.10352e-05
+offset_top = 1.12057e-05
+offset_right = 256.0
+offset_bottom = 128.0
+
+[node name="T1S2" type="ColorRect" parent="Control"]
+material = SubResource("ShaderMaterial_6p2t7")
+layout_mode = 0
+offset_left = 257.0
+offset_top = 3.05176e-05
+offset_right = 513.0
+offset_bottom = 128.0
+
+[node name="Linear" type="ColorRect" parent="Control"]
+material = SubResource("ShaderMaterial_kdsl2")
+layout_mode = 0
+offset_top = 129.0
+offset_right = 513.0
+offset_bottom = 378.0
+
+[node name="MixMax" type="ColorRect" parent="Control"]
+material = SubResource("ShaderMaterial_ty3jg")
+layout_mode = 0
+offset_top = 379.0
+offset_right = 513.0
+offset_bottom = 627.0
