@@ -1,0 +1,478 @@
+[gd_scene load_steps=55 format=3 uid="uid://baufb0cy17m81"]
+
+[ext_resource type="Texture2D" uid="uid://cj2m37k084kns" path="res://textures/Rock051_2K-JPG_NormalGL.jpg" id="1_n0s1h"]
+[ext_resource type="Texture2D" uid="uid://bv5nxkmftxdie" path="res://textures/Rock051_2K-JPG_Roughness.jpg" id="2_ud14j"]
+[ext_resource type="Texture2D" uid="uid://oodh88cxqm68" path="res://textures/Rock051_2K-JPG_Displacement.jpg" id="3_71glh"]
+[ext_resource type="Texture2D" uid="uid://oiiyta367asp" path="res://textures/Rock051_2K-JPG_Color.jpg" id="4_bsi34"]
+[ext_resource type="Texture2D" uid="uid://dglc8cynsmgky" path="res://textures/Ground067_2K-JPG_NormalGL.jpg" id="5_s0o6u"]
+[ext_resource type="Texture2D" uid="uid://dx4vr7ogjbvch" path="res://textures/Ground067_2K-JPG_Roughness.jpg" id="6_vaa16"]
+[ext_resource type="Texture2D" uid="uid://7kuthv538rm5" path="res://textures/Ground067_2K-JPG_Displacement.jpg" id="7_3g34o"]
+[ext_resource type="Texture2D" uid="uid://tt01pes8xxgv" path="res://textures/Ground067_2K-JPG_Color.jpg" id="8_oai4k"]
+[ext_resource type="Texture2D" uid="uid://cw0l4qaf0m0o2" path="res://textures/Bricks085_2K-JPG_NormalGL.jpg" id="9_3lkkc"]
+[ext_resource type="Texture2D" uid="uid://cyc8byl64i6c8" path="res://textures/Bricks085_2K-JPG_Roughness.jpg" id="10_0uavf"]
+[ext_resource type="Texture2D" uid="uid://bwqpb8bxgtej" path="res://textures/Bricks085_2K-JPG_Displacement.jpg" id="11_apw2j"]
+[ext_resource type="Texture2D" uid="uid://dmjdq0i1m7kjx" path="res://textures/Bricks085_2K-JPG_Color.jpg" id="12_dcno8"]
+[ext_resource type="Texture2D" uid="uid://d11pwaby3e55k" path="res://textures/Ground054_2K-JPG_NormalGL.jpg" id="13_ca14n"]
+[ext_resource type="Texture2D" uid="uid://resokj1k4mlu" path="res://textures/Ground054_2K-JPG_Roughness.jpg" id="14_n7oi3"]
+[ext_resource type="Texture2D" uid="uid://cq5da06th7sx1" path="res://textures/Ground054_2K-JPG_Displacement.jpg" id="15_hutfc"]
+[ext_resource type="Texture2D" uid="uid://usd8nuiolnnp" path="res://textures/Ground054_2K-JPG_Color.jpg" id="16_8qstw"]
+[ext_resource type="Texture2D" uid="uid://cidhbnr873auk" path="res://textures/Grass004_2K-JPG_NormalGL.jpg" id="17_ldkhu"]
+[ext_resource type="Texture2D" uid="uid://rff1vgfht3av" path="res://textures/Grass004_2K-JPG_Roughness.jpg" id="18_3q3n0"]
+[ext_resource type="Texture2D" uid="uid://2w0ulrx1npps" path="res://textures/Grass004_2K-JPG_Displacement.jpg" id="19_sxhp4"]
+[ext_resource type="Texture2D" uid="uid://c7lxmi62kabpl" path="res://textures/Grass004_2K-JPG_Color.jpg" id="20_r0adv"]
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_tmkmp"]
+
+[sub_resource type="Shader" id="Shader_er6f8"]
+code = "shader_type spatial;
+
+uniform sampler2D T1 : filter_linear_mipmap;
+uniform sampler2D T2 : filter_linear_mipmap;
+uniform sampler2D N1 : filter_linear_mipmap;
+uniform sampler2D N2 : filter_linear_mipmap;
+uniform sampler2D R1 : filter_linear_mipmap;
+uniform sampler2D R2 : filter_linear_mipmap;
+uniform sampler2D S1 : filter_linear_mipmap;
+uniform sampler2D S2 : filter_linear_mipmap;
+uniform float lambda = 0.01; 
+uniform bool mask = false;
+uniform float a = 1.0;
+uniform float b = 0.0;
+uniform float ratio1 = 1.0;
+uniform float ratio2 = 1.0;
+
+varying vec2 uv1;
+varying vec2 uv2;
+
+void vertex() {
+	uv1 = UV * vec2(1.0, ratio1);
+	uv2 = UV * vec2(1.0, ratio2);
+}
+
+float Phi(float x) {
+	return tanh(0.85 * x) * 0.5 + 0.5;
+}
+
+void fragment() {
+	vec3 t1 = texture(T1, uv1).rgb;
+	vec3 t2 = texture(T2, uv2).rgb;
+	vec3 n1 = texture(N1, uv1).xyz + 0.5;
+	vec3 n2 = texture(N2, uv2).xyz + 0.5;
+	float r1 = texture(R1, uv1).x;
+	float r2 = texture(R2, uv2).x;
+	
+	
+	float s1 = texture(S1, uv1).x;
+	float s2 = texture(S2, uv2).x;
+	
+	float v1 = UV.x * a + b;
+	float v2 = 1.0 - v1;
+	
+	float w;
+	if (lambda == 0.0) {
+		w = (s2 + v2 > s1 + v1) ? 0.0 : 1.0;
+	} else {
+		w = 1.0 - Phi((10.0*((s2 + v2) - (s1 + v1)))/(10.0*2.0 * lambda));
+	}
+	
+	ALBEDO = mix(t2, t1, w);
+	NORMAL_MAP = normalize(mix(n2, n1, w));
+	ROUGHNESS = mix(r2, r1, w);
+}
+"
+
+[sub_resource type="CompressedTexture2D" id="CompressedTexture2D_jlig2"]
+load_path = "res://.godot/imported/PavingStones131_2K-JPG_NormalGL.jpg-20f74ab0b3f6dd37094483da7bf2690a.s3tc.ctex"
+
+[sub_resource type="CompressedTexture2D" id="CompressedTexture2D_ejrlc"]
+load_path = "res://.godot/imported/Ground037_2K-JPG_NormalGL.jpg-8845442485ed4911ebe798cc70981941.s3tc.ctex"
+
+[sub_resource type="CompressedTexture2D" id="CompressedTexture2D_3nuya"]
+load_path = "res://.godot/imported/PavingStones131_2K-JPG_Roughness.jpg-31c619fea5a60d91c705554553574334.s3tc.ctex"
+
+[sub_resource type="CompressedTexture2D" id="CompressedTexture2D_lf7o0"]
+load_path = "res://.godot/imported/Ground037_2K-JPG_Roughness.jpg-04ac5b1d7a13fcb41ffa2d4b633719c3.s3tc.ctex"
+
+[sub_resource type="CompressedTexture2D" id="CompressedTexture2D_an5jq"]
+load_path = "res://.godot/imported/PavingStones131_2K-JPG_Displacement.jpg-03ecd7624aab0d88cfee59b829872f55.s3tc.ctex"
+
+[sub_resource type="CompressedTexture2D" id="CompressedTexture2D_rick4"]
+load_path = "res://.godot/imported/Ground037_2K-JPG_Displacement.jpg-1fe0510955262b88509cc3534312fba1.s3tc.ctex"
+
+[sub_resource type="CompressedTexture2D" id="CompressedTexture2D_3bgf0"]
+load_path = "res://.godot/imported/PavingStones131_2K-JPG_Color.jpg-1207a7ba3b39225d78b7e303ffdbc615.s3tc.ctex"
+
+[sub_resource type="CompressedTexture2D" id="CompressedTexture2D_y0c3a"]
+load_path = "res://.godot/imported/Ground037_2K-JPG_Color.jpg-40cd776a27b981a8dfa0f05244550812.s3tc.ctex"
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_6pahf"]
+render_priority = 0
+shader = SubResource("Shader_er6f8")
+shader_parameter/lambda = 0.01
+shader_parameter/mask = false
+shader_parameter/a = 0.475
+shader_parameter/b = 0.306
+shader_parameter/ratio1 = 1.0
+shader_parameter/ratio2 = 1.0
+shader_parameter/T1 = SubResource("CompressedTexture2D_3bgf0")
+shader_parameter/T2 = SubResource("CompressedTexture2D_y0c3a")
+shader_parameter/N1 = SubResource("CompressedTexture2D_jlig2")
+shader_parameter/N2 = SubResource("CompressedTexture2D_ejrlc")
+shader_parameter/R1 = SubResource("CompressedTexture2D_3nuya")
+shader_parameter/R2 = SubResource("CompressedTexture2D_lf7o0")
+shader_parameter/S1 = SubResource("CompressedTexture2D_an5jq")
+shader_parameter/S2 = SubResource("CompressedTexture2D_rick4")
+
+[sub_resource type="Shader" id="Shader_qpubi"]
+code = "shader_type spatial;
+
+uniform sampler2D T1 : filter_linear_mipmap;
+uniform sampler2D T2 : filter_linear_mipmap;
+uniform sampler2D N1 : filter_linear_mipmap;
+uniform sampler2D N2 : filter_linear_mipmap;
+uniform sampler2D R1 : filter_linear_mipmap;
+uniform sampler2D R2 : filter_linear_mipmap;
+uniform sampler2D S1 : filter_linear_mipmap;
+uniform sampler2D S2 : filter_linear_mipmap;
+uniform float lambda = 0.01; 
+uniform bool mask = false;
+uniform float a = 1.0;
+uniform float b = 0.0;
+uniform float ratio1 = 1.0;
+uniform float ratio2 = 1.0;
+
+varying vec2 uv1;
+varying vec2 uv2;
+
+void vertex() {
+	uv1 = UV * vec2(1.0, ratio1);
+	uv2 = UV * vec2(1.0, ratio2);
+}
+
+float Phi(float x) {
+	return tanh(0.85 * x) * 0.5 + 0.5;
+}
+
+void fragment() {
+	vec3 t1 = texture(T1, uv1).rgb;
+	vec3 t2 = texture(T2, uv2).rgb;
+	vec3 n1 = texture(N1, uv1).xyz + 0.5;
+	vec3 n2 = texture(N2, uv2).xyz + 0.5;
+	float r1 = texture(R1, uv1).x;
+	float r2 = texture(R2, uv2).x;
+	
+	
+	float s1 = texture(S1, uv1).x;
+	float s2 = texture(S2, uv2).x;
+	
+	float v1 = UV.x * a + b;
+	float v2 = 1.0 - v1;
+	
+	float w;
+	if (lambda == 0.0) {
+		w = (s2 + v2 > s1 + v1) ? 0.0 : 1.0;
+	} else {
+		w = 1.0 - Phi((10.0*((s2 + v2) - (s1 + v1)))/(10.0*2.0 * lambda));
+	}
+	
+	ALBEDO = mix(t2, t1, w);
+	NORMAL_MAP = normalize(mix(n2, n1, w));
+	ROUGHNESS = mix(r2, r1, w);
+}
+"
+
+[sub_resource type="CompressedTexture2D" id="CompressedTexture2D_ljrqp"]
+load_path = "res://.godot/imported/Ground037_2K-JPG_NormalGL.jpg-8845442485ed4911ebe798cc70981941.s3tc.ctex"
+
+[sub_resource type="CompressedTexture2D" id="CompressedTexture2D_02q60"]
+load_path = "res://.godot/imported/Ground037_2K-JPG_Roughness.jpg-04ac5b1d7a13fcb41ffa2d4b633719c3.s3tc.ctex"
+
+[sub_resource type="CompressedTexture2D" id="CompressedTexture2D_cx2s4"]
+load_path = "res://.godot/imported/Ground037_2K-JPG_Displacement.jpg-1fe0510955262b88509cc3534312fba1.s3tc.ctex"
+
+[sub_resource type="CompressedTexture2D" id="CompressedTexture2D_pmvpa"]
+load_path = "res://.godot/imported/Ground037_2K-JPG_Color.jpg-40cd776a27b981a8dfa0f05244550812.s3tc.ctex"
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_x3tmx"]
+render_priority = 0
+shader = SubResource("Shader_qpubi")
+shader_parameter/lambda = 0.01
+shader_parameter/mask = false
+shader_parameter/a = 0.354
+shader_parameter/b = 0.368
+shader_parameter/ratio1 = 1.0
+shader_parameter/ratio2 = 1.0
+shader_parameter/T1 = SubResource("CompressedTexture2D_pmvpa")
+shader_parameter/T2 = ExtResource("4_bsi34")
+shader_parameter/N1 = SubResource("CompressedTexture2D_ljrqp")
+shader_parameter/N2 = ExtResource("1_n0s1h")
+shader_parameter/R1 = SubResource("CompressedTexture2D_02q60")
+shader_parameter/R2 = ExtResource("2_ud14j")
+shader_parameter/S1 = SubResource("CompressedTexture2D_cx2s4")
+shader_parameter/S2 = ExtResource("3_71glh")
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_oyuxj"]
+render_priority = 0
+shader = SubResource("Shader_qpubi")
+shader_parameter/lambda = 0.01
+shader_parameter/mask = false
+shader_parameter/a = 0.354
+shader_parameter/b = 0.298
+shader_parameter/ratio1 = 1.0
+shader_parameter/ratio2 = 1.0
+shader_parameter/T1 = ExtResource("4_bsi34")
+shader_parameter/T2 = ExtResource("8_oai4k")
+shader_parameter/N1 = ExtResource("1_n0s1h")
+shader_parameter/N2 = ExtResource("5_s0o6u")
+shader_parameter/R1 = ExtResource("2_ud14j")
+shader_parameter/R2 = ExtResource("6_vaa16")
+shader_parameter/S1 = ExtResource("3_71glh")
+shader_parameter/S2 = ExtResource("7_3g34o")
+
+[sub_resource type="Shader" id="Shader_x38ki"]
+code = "shader_type spatial;
+
+uniform sampler2D T1 : filter_linear_mipmap;
+uniform sampler2D T2 : filter_linear_mipmap;
+uniform sampler2D N1 : filter_linear_mipmap;
+uniform sampler2D N2 : filter_linear_mipmap;
+uniform sampler2D R1 : filter_linear_mipmap;
+uniform sampler2D R2 : filter_linear_mipmap;
+uniform sampler2D S1 : filter_linear_mipmap;
+uniform sampler2D S2 : filter_linear_mipmap;
+uniform float lambda = 0.01; 
+uniform bool mask = false;
+uniform float a = 1.0;
+uniform float b = 0.0;
+uniform float ratio1 = 1.0;
+uniform float ratio2 = 1.0;
+
+varying vec2 uv1;
+varying vec2 uv2;
+
+void vertex() {
+	uv1 = UV * vec2(1.0, ratio1);
+	uv2 = UV * vec2(1.0, ratio2);
+}
+
+float Phi(float x) {
+	return tanh(0.85 * x) * 0.5 + 0.5;
+}
+
+void fragment() {
+	vec3 t1 = texture(T1, uv1).rgb;
+	vec3 t2 = texture(T2, uv2).rgb;
+	vec3 n1 = texture(N1, uv1).xyz + 0.5;
+	vec3 n2 = texture(N2, uv2).xyz + 0.5;
+	float r1 = texture(R1, uv1).x;
+	float r2 = texture(R2, uv2).x;
+	
+	
+	float s1 = texture(S1, uv1).x;
+	float s2 = texture(S2, uv2).x;
+	
+	float v1 = UV.x * a + b;
+	float v2 = 1.0 - v1;
+	
+	float w;
+	if (lambda == 0.0) {
+		w = (s2 + v2 > s1 + v1) ? 0.0 : 1.0;
+	} else {
+		w = 1.0 - Phi((10.0*((s2 + v2) - (s1 + v1)))/(10.0*2.0 * lambda));
+	}
+	
+	ALBEDO = mix(t2, t1, w);
+	NORMAL_MAP = normalize(mix(n2, n1, w));
+	ROUGHNESS = mix(r2, r1, w);
+}
+"
+
+[sub_resource type="CompressedTexture2D" id="CompressedTexture2D_bptui"]
+load_path = "res://.godot/imported/Ground067_2K-JPG_NormalGL.jpg-26022b71397ed408334008d0dd463138.s3tc.ctex"
+
+[sub_resource type="CompressedTexture2D" id="CompressedTexture2D_4xafe"]
+load_path = "res://.godot/imported/Ground067_2K-JPG_Roughness.jpg-1def4b739d6a3c6efb7867ee0c6e68e4.s3tc.ctex"
+
+[sub_resource type="CompressedTexture2D" id="CompressedTexture2D_c31kw"]
+load_path = "res://.godot/imported/Ground067_2K-JPG_Displacement.jpg-6233782cd1eb4ef95b0bf9320b70b931.s3tc.ctex"
+
+[sub_resource type="CompressedTexture2D" id="CompressedTexture2D_16r7a"]
+load_path = "res://.godot/imported/Ground067_2K-JPG_Color.jpg-34d57ace91025b5ecadda07225aff95f.s3tc.ctex"
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_e3p5a"]
+render_priority = 0
+shader = SubResource("Shader_x38ki")
+shader_parameter/lambda = 0.01
+shader_parameter/mask = false
+shader_parameter/a = 0.344
+shader_parameter/b = 0.478
+shader_parameter/ratio1 = 1.0
+shader_parameter/ratio2 = 2.0
+shader_parameter/T1 = SubResource("CompressedTexture2D_16r7a")
+shader_parameter/T2 = ExtResource("12_dcno8")
+shader_parameter/N1 = SubResource("CompressedTexture2D_bptui")
+shader_parameter/N2 = ExtResource("9_3lkkc")
+shader_parameter/R1 = SubResource("CompressedTexture2D_4xafe")
+shader_parameter/R2 = ExtResource("10_0uavf")
+shader_parameter/S1 = SubResource("CompressedTexture2D_c31kw")
+shader_parameter/S2 = ExtResource("11_apw2j")
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_05g83"]
+render_priority = 0
+shader = SubResource("Shader_x38ki")
+shader_parameter/lambda = 0.01
+shader_parameter/mask = false
+shader_parameter/a = 0.369
+shader_parameter/b = 0.243
+shader_parameter/ratio1 = 2.0
+shader_parameter/ratio2 = 1.0
+shader_parameter/T1 = ExtResource("12_dcno8")
+shader_parameter/T2 = ExtResource("16_8qstw")
+shader_parameter/N1 = ExtResource("9_3lkkc")
+shader_parameter/N2 = ExtResource("13_ca14n")
+shader_parameter/R1 = ExtResource("10_0uavf")
+shader_parameter/R2 = ExtResource("14_n7oi3")
+shader_parameter/S1 = ExtResource("11_apw2j")
+shader_parameter/S2 = ExtResource("15_hutfc")
+
+[sub_resource type="Shader" id="Shader_lvidk"]
+code = "shader_type spatial;
+
+uniform sampler2D T1 : filter_linear_mipmap;
+uniform sampler2D T2 : filter_linear_mipmap;
+uniform sampler2D N1 : filter_linear_mipmap;
+uniform sampler2D N2 : filter_linear_mipmap;
+uniform sampler2D R1 : filter_linear_mipmap;
+uniform sampler2D R2 : filter_linear_mipmap;
+uniform sampler2D S1 : filter_linear_mipmap;
+uniform sampler2D S2 : filter_linear_mipmap;
+uniform float lambda = 0.01; 
+uniform bool mask = false;
+uniform float a = 1.0;
+uniform float b = 0.0;
+uniform float ratio1 = 1.0;
+uniform float ratio2 = 1.0;
+
+varying vec2 uv1;
+varying vec2 uv2;
+
+void vertex() {
+	uv1 = UV * vec2(1.0, ratio1);
+	uv2 = UV * vec2(1.0, ratio2);
+}
+
+float Phi(float x) {
+	return tanh(0.85 * x) * 0.5 + 0.5;
+}
+
+void fragment() {
+	vec3 t1 = texture(T1, uv1).rgb;
+	vec3 t2 = texture(T2, uv2).rgb;
+	vec3 n1 = texture(N1, uv1).xyz + 0.5;
+	vec3 n2 = texture(N2, uv2).xyz + 0.5;
+	float r1 = texture(R1, uv1).x;
+	float r2 = texture(R2, uv2).x;
+	
+	
+	float s1 = texture(S1, uv1).x;
+	float s2 = texture(S2, uv2).x;
+	
+	float v1 = UV.x * a + b;
+	float v2 = 1.0 - v1;
+	
+	float w;
+	if (lambda == 0.0) {
+		w = (s2 + v2 > s1 + v1) ? 0.0 : 1.0;
+	} else {
+		w = 1.0 - Phi((10.0*((s2 + v2) - (s1 + v1)))/(10.0*2.0 * lambda));
+	}
+	
+	ALBEDO = mix(t2, t1, w);
+	NORMAL_MAP = normalize(mix(n2, n1, w));
+	ROUGHNESS = mix(r2, r1, w);
+}
+"
+
+[sub_resource type="CompressedTexture2D" id="CompressedTexture2D_unf6k"]
+load_path = "res://.godot/imported/Ground054_2K-JPG_NormalGL.jpg-f438aebdaed09e7aac936ff4282a0000.s3tc.ctex"
+
+[sub_resource type="CompressedTexture2D" id="CompressedTexture2D_i2vmb"]
+load_path = "res://.godot/imported/Ground054_2K-JPG_Roughness.jpg-61fa8bf07542719f14c924ed6dbaa779.s3tc.ctex"
+
+[sub_resource type="CompressedTexture2D" id="CompressedTexture2D_wrdoj"]
+load_path = "res://.godot/imported/Ground054_2K-JPG_Displacement.jpg-896c784d19f9349a286bcb665523cc58.s3tc.ctex"
+
+[sub_resource type="CompressedTexture2D" id="CompressedTexture2D_6kgd5"]
+load_path = "res://.godot/imported/Ground054_2K-JPG_Color.jpg-0a59ec10a1d594e9c29885192b7dcba4.s3tc.ctex"
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_ibc03"]
+render_priority = 0
+shader = SubResource("Shader_lvidk")
+shader_parameter/lambda = 0.01
+shader_parameter/mask = false
+shader_parameter/a = 0.879
+shader_parameter/b = -0.287
+shader_parameter/ratio1 = 1.0
+shader_parameter/ratio2 = 1.0
+shader_parameter/T1 = SubResource("CompressedTexture2D_6kgd5")
+shader_parameter/T2 = ExtResource("20_r0adv")
+shader_parameter/N1 = SubResource("CompressedTexture2D_unf6k")
+shader_parameter/N2 = ExtResource("17_ldkhu")
+shader_parameter/R1 = SubResource("CompressedTexture2D_i2vmb")
+shader_parameter/R2 = ExtResource("18_3q3n0")
+shader_parameter/S1 = SubResource("CompressedTexture2D_wrdoj")
+shader_parameter/S2 = ExtResource("19_sxhp4")
+
+[sub_resource type="PhysicalSkyMaterial" id="PhysicalSkyMaterial_mu7vj"]
+energy_multiplier = 2.0
+
+[sub_resource type="Sky" id="Sky_ul75q"]
+sky_material = SubResource("PhysicalSkyMaterial_mu7vj")
+
+[sub_resource type="Environment" id="Environment_628yr"]
+background_mode = 2
+sky = SubResource("Sky_ul75q")
+
+[node name="Control" type="Node3D"]
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
+mesh = SubResource("PlaneMesh_tmkmp")
+surface_material_override/0 = SubResource("ShaderMaterial_6pahf")
+
+[node name="MeshInstance3D2" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 0, 0)
+mesh = SubResource("PlaneMesh_tmkmp")
+surface_material_override/0 = SubResource("ShaderMaterial_x3tmx")
+
+[node name="MeshInstance3D3" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4, 0, 0)
+mesh = SubResource("PlaneMesh_tmkmp")
+surface_material_override/0 = SubResource("ShaderMaterial_oyuxj")
+
+[node name="MeshInstance3D4" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6, 0, 0)
+mesh = SubResource("PlaneMesh_tmkmp")
+surface_material_override/0 = SubResource("ShaderMaterial_e3p5a")
+
+[node name="MeshInstance3D5" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8, 0, 0)
+mesh = SubResource("PlaneMesh_tmkmp")
+surface_material_override/0 = SubResource("ShaderMaterial_05g83")
+
+[node name="MeshInstance3D6" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10, 0, 0)
+mesh = SubResource("PlaneMesh_tmkmp")
+surface_material_override/0 = SubResource("ShaderMaterial_ibc03")
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 0.941076, 0.338196, 0, -0.338196, 0.941076, 0, 0, 0)
+light_color = Color(0.905882, 0.882353, 0.854902, 1)
+light_energy = 2.0
+
+[node name="Camera3D" type="Camera3D" parent="."]
+transform = Transform3D(-1, 8.74228e-08, 3.82137e-15, 0, -4.37114e-08, 1, 8.74228e-08, 1, 4.37114e-08, -0.079, 2, -0.571)
+projection = 1
+size = 0.5
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Environment_628yr")

@@ -1,0 +1,225 @@
+[gd_scene load_steps=14 format=3 uid="uid://b4fb4cj7nio1w"]
+
+[ext_resource type="Script" path="res://screenshot.gd" id="1_3vdrs"]
+[ext_resource type="Texture2D" uid="uid://o8gesc5hdk6l" path="res://textures/T4.png" id="1_7kdd7"]
+[ext_resource type="Texture2D" uid="uid://c31g44547nl3l" path="res://textures/T_gaussian.png" id="2_4mr4b"]
+[ext_resource type="Texture2D" uid="uid://c7bcx50lsqxw7" path="res://textures/T_inv.png" id="3_yymch"]
+[ext_resource type="Texture2D" uid="uid://wn3bqgnxfny7" path="res://textures/PavingStones131_2K-JPG_Displacement.jpg" id="4_5vhjp"]
+
+[sub_resource type="Shader" id="Shader_5qe4j"]
+code = "shader_type canvas_item;
+
+uniform sampler2D T : repeat_enable, filter_linear;
+varying float v1;
+varying float v2;
+varying vec2 uv1;
+varying vec2 uv2;
+global uniform vec2 uv2_offset;
+global uniform float zoom;
+
+void vertex() {
+	v1 = UV.x;
+	v2 = 1.0 - v1;
+	uv1 = UV * vec2(1.0, 1.0/4.0) * zoom;
+	uv2 = UV * vec2(1.0, 1.0/4.0) * zoom + uv2_offset;
+}
+
+void fragment() {
+	vec3 t1 = texture(T, uv1).rgb;
+	vec3 t2 = texture(T, uv2).rgb;
+	COLOR.rgb = mix(t2, t1, v1);
+}
+"
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_tqvc8"]
+shader = SubResource("Shader_5qe4j")
+shader_parameter/T = ExtResource("1_7kdd7")
+
+[sub_resource type="Shader" id="Shader_qhkko"]
+code = "shader_type canvas_item;
+
+uniform sampler2D T : repeat_enable, filter_linear;
+uniform sampler2D T_inv : repeat_enable, filter_linear;
+varying float v1;
+varying float v2;
+varying vec2 uv1;
+varying vec2 uv2;
+global uniform vec2 uv2_offset;
+global uniform float zoom;
+
+const float gaussian_avg = 0.5;
+const float gaussian_std = 0.16667;
+
+void vertex() {
+	v1 = UV.x;
+	v2 = 1.0 - v1;
+	uv1 = UV * vec2(1.0, 1.0/4.0) * zoom;
+	uv2 = UV * vec2(1.0, 1.0/4.0) * zoom + uv2_offset;
+}
+
+float Phi(float x) {
+	x = (x - gaussian_avg) / (gaussian_std);
+	return 0.5 + 0.5 * tanh(0.85 * x);
+}
+
+void fragment() {
+	vec3 t1 = texture(T, uv1).rgb;
+	vec3 t2 = texture(T, uv2).rgb;
+	
+	float w = v1 / sqrt(v1*v1 + v2*v2);
+	
+	vec3 G = mix(t2, t1, w);
+	
+	float r = texture(T_inv, vec2(Phi(G.r))).r;
+	float g = texture(T_inv, vec2(Phi(G.g))).g;
+	float b = texture(T_inv, vec2(Phi(G.b))).b;
+	
+	COLOR.rgb = vec3(r, g, b);
+}
+"
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_38786"]
+shader = SubResource("Shader_qhkko")
+shader_parameter/T = ExtResource("2_4mr4b")
+shader_parameter/T_inv = ExtResource("3_yymch")
+
+[sub_resource type="Shader" id="Shader_l018e"]
+code = "shader_type canvas_item;
+
+uniform sampler2D T : repeat_enable, filter_linear;
+varying float v1;
+varying float v2;
+varying vec2 uv1;
+varying vec2 uv2;
+global uniform vec2 uv2_offset;
+
+global uniform float zoom;
+
+void vertex() {
+	v1 = UV.x;
+	v2 = 1.0 - v1;
+	uv1 = UV * vec2(1.0, 1.0/4.0) * zoom;
+	uv2 = UV * vec2(1.0, 1.0/4.0) * zoom + uv2_offset;
+}
+
+const float beta = 0.6;
+float metric (vec3 c) {
+	float luminance = c.r * 0.299 + c.g * 0.581 + c.b * 0.114;
+	return (1.0 - beta) + beta * luminance;
+}
+
+const float e = 9.0;
+void fragment() {
+	vec3 t1 = texture(T, uv1).rgb;
+	vec3 t2 = texture(T, uv2).rgb;
+	
+	float w1 = v1 * pow(metric(t1), e);
+	float w2 = v2 * pow(metric(t2), e);
+	float w = w1 / (w1 + w2);
+	
+	COLOR.rgb = mix(t2, t1, w);
+}
+"
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_deii8"]
+shader = SubResource("Shader_l018e")
+shader_parameter/T = ExtResource("1_7kdd7")
+
+[sub_resource type="Shader" id="Shader_5skkj"]
+code = "shader_type canvas_item;
+
+uniform sampler2D T : repeat_enable, filter_linear;
+uniform sampler2D S : repeat_enable, filter_linear;
+varying float v1;
+varying float v2;
+varying vec2 uv1;
+varying vec2 uv2;
+global uniform vec2 uv2_offset;
+global uniform float zoom;
+
+void vertex() {
+	v1 = UV.x;
+	v2 = 1.0 - v1;
+	uv1 = UV * vec2(1.0, 1.0/4.0) * zoom;
+	uv2 = UV * vec2(1.0, 1.0/4.0) * zoom + uv2_offset;
+}
+
+float metric (vec3 c) {
+	return c.r * 0.299 + c.g * 0.581 + c.b * 0.114;
+}
+
+float Phi(float x) {
+	return 0.5 + 0.5 * tanh(0.85 * x);
+}
+
+const float basevar = 0.005;
+void fragment() {
+	vec3 t1 = texture(T, uv1).rgb;
+	vec3 t2 = texture(T, uv2).rgb;
+	
+	float s_mean = textureLod(S, vec2(0.5), 100).x;
+	float s1 = texture(S, uv1).x - s_mean;
+	float s2 = texture(S, uv2).x - s_mean;
+	
+	s2 = -s2;
+	
+	float w = 1.0 - Phi(((s2 + v2) - (s1 + v1)) / sqrt(2.0 * basevar));
+	
+	COLOR.rgb = mix(t2, t1, w);
+	//COLOR.rgb = mix(vec3(1), vec3(0), w);
+	//COLOR.rgb = vec3(s2);
+}
+"
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_375nv"]
+shader = SubResource("Shader_5skkj")
+shader_parameter/T = ExtResource("1_7kdd7")
+shader_parameter/S = ExtResource("4_5vhjp")
+
+[node name="Control" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 19.0
+offset_top = 294.0
+offset_right = -621.0
+offset_bottom = -218.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_3vdrs")
+path = "ours.png"
+
+[node name="Camera2D" type="Camera2D" parent="."]
+position = Vector2(1024, 1856)
+
+[node name="Control" type="Control" parent="."]
+anchors_preset = 0
+offset_top = 4.0
+offset_right = 40.0
+offset_bottom = 44.0
+scale = Vector2(4, 4)
+
+[node name="Linear" type="ColorRect" parent="Control"]
+material = SubResource("ShaderMaterial_tqvc8")
+layout_mode = 0
+offset_right = 512.0
+offset_bottom = 128.0
+
+[node name="HN18" type="ColorRect" parent="Control"]
+material = SubResource("ShaderMaterial_38786")
+offset_top = 133.0
+offset_right = 512.0
+offset_bottom = 261.0
+
+[node name="M22" type="ColorRect" parent="Control"]
+material = SubResource("ShaderMaterial_deii8")
+offset_top = 266.0
+offset_right = 512.0
+offset_bottom = 394.0
+
+[node name="Ours" type="ColorRect" parent="Control"]
+material = SubResource("ShaderMaterial_375nv")
+offset_top = 399.0
+offset_right = 512.0
+offset_bottom = 527.0

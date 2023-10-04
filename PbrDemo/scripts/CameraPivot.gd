@@ -29,10 +29,10 @@ func _input(event):
 			rdragging = false
 		
 		if event.button_index == MOUSE_BUTTON_WHEEL_DOWN:
-			distance += 0.1
+			distance += 0.01
 		if event.button_index == MOUSE_BUTTON_WHEEL_UP:
 			distance -= 0.1
-		distance = clamp(distance, 0.2, 10)
+		distance = clamp(distance, -10, 10)
 	
 	if event is InputEventMouseMotion:
 		event = event as InputEventMouseMotion
@@ -55,9 +55,7 @@ func _input(event):
 			
 			pos += -(rgt * event.relative.x + fwd * event.relative.y) * 0.01
 			
-			print(fwd)
-			print(rgt)
-			print(event.relative)
+
 			
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
@@ -67,11 +65,7 @@ func _process(delta):
 	rotate_x(elevation)
 	rotate_y(azimuth)
 	translate_object_local(Vector3(0, 0, distance))
-	
-	print(pos)
-	print(azimuth)
-	print(elevation)
-	print(distance)
+
 
 var lock = false
 func _on_control_mouse_entered():

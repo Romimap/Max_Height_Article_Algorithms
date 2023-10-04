@@ -15,6 +15,11 @@ run/main_scene="res://root.tscn"
 config/features=PackedStringArray("4.1", "Forward Plus")
 config/icon="res://icon.svg"
 
+[display]
+
+window/vsync/vsync_mode=0
+
 [rendering]
 
+scaling_3d/scale=2.0
 anti_aliasing/quality/msaa_2d=1

@@ -63,8 +63,10 @@ float Phi (float x) {
 	return tanh(0.85 * x) * 0.5 + 0.5;
 }
 
+const float t = 0.87;
+
 float max_priority (vec2 uv, vec2 duvdx, vec2 duvdy) {
-	vec2 bm1 = textureGrad(BM1, uv, duvdx, duvdy).rg - 0.5;
+	vec2 bm1 = textureGrad(BM1, uv * t, duvdx, duvdy).rg - 0.5;
 	vec2 bm2 = textureGrad(BM2, uv, duvdx, duvdy).rg - 0.5;
 	
 	float mu1 = bm1.x;
@@ -87,11 +89,11 @@ float max_priority (vec2 uv, vec2 duvdx, vec2 duvdy) {
 void fragment() {
 	float w = max_priority(UV, dFdx(UV), dFdy(UV));
 	
-	vec3 t1 = textureGrad(T1, UV, dFdx(UV), dFdy(UV)).rgb;
+	vec3 t1 = textureGrad(T1, UV * t, dFdx(UV), dFdy(UV)).rgb;
 	vec3 t2 = textureGrad(T2, UV, dFdx(UV), dFdy(UV)).rgb;
-	vec3 n1 = textureGrad(N1, UV, dFdx(UV), dFdy(UV)).xyz;
+	vec3 n1 = textureGrad(N1, UV * t, dFdx(UV), dFdy(UV)).xyz;
 	vec3 n2 = textureGrad(N2, UV, dFdx(UV), dFdy(UV)).xyz;
-	float r1 = textureGrad(R1, UV, dFdx(UV), dFdy(UV)).x;
+	float r1 = textureGrad(R1, UV * t, dFdx(UV), dFdy(UV)).x;
 	float r2 = textureGrad(R2, UV, dFdx(UV), dFdy(UV)).x;
 	
 	ALBEDO = mix(t2 * sand_tint.rgb, t1 * rocks_tint.rgb, w);

@@ -164,6 +164,15 @@ int main () {
 	T1 = load("T1.png");
 	T2 = load("T2.png");
 
+	VariancePreserving method(T1, T2);
+
+	cv::Mat* tinv = method.exportLut();
+
+	save("T_inv.png", tinv);
+	save("T_gaussian.png", method.exportGaussianT1());
+
+	return 0;
+
 	runVariancePreserving();
 	runLinear();
 	runHex();

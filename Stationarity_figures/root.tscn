@@ -1,0 +1,30 @@
+[gd_scene load_steps=6 format=3 uid="uid://diq2ohurtl0d0"]
+
+[ext_resource type="Shader" path="res://ours.gdshader" id="1_4o38a"]
+[ext_resource type="Texture2D" uid="uid://bf5t035u1f2ma" path="res://textures/Paving/T.png" id="2_2bj62"]
+[ext_resource type="Texture2D" uid="uid://bysvfa728ehs4" path="res://textures/Paving/BM.png" id="3_sk03y"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_osvmt"]
+render_priority = 0
+shader = ExtResource("1_4o38a")
+shader_parameter/lambda = 0.025
+shader_parameter/beta = 1.105
+shader_parameter/printgrid = true
+shader_parameter/uvoffset = Vector2(0, 0)
+shader_parameter/symetrize = true
+shader_parameter/albedo = ExtResource("2_2bj62")
+shader_parameter/bm = ExtResource("3_sk03y")
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_08uv2"]
+size = Vector2(64, 64)
+
+[node name="Node3D" type="Node3D"]
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
+material_override = SubResource("ShaderMaterial_osvmt")
+mesh = SubResource("PlaneMesh_08uv2")
+
+[node name="Camera3D" type="Camera3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, -4.37114e-08, 1, 0, -1, -4.37114e-08, 0, 41.669, 0)
+projection = 1
+size = 5.0

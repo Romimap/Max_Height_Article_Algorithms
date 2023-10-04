@@ -113,6 +113,28 @@ private:
     }
 
 public:
+    cv::Mat* exportLut() {
+        cv::Mat* out = new cv::Mat(1, lut1[0].size() / 1000, m_gaussianT1->type());
+        printf("%d\n",  lut1[0].size() / 1000);
+
+        for (int x = 0; x < lut1[0].size(); x+=1000) {
+            for (int y = 0; y < 1; y++) {
+                double r = lut1[2][x].v;
+                double g = lut1[1][x].v;
+                double b = lut1[0][x].v;
+                cv::Vec3d texel(b, g, r);
+                out->at<cv::Vec3d>(y, x/1000) = texel;
+            }
+        }
+
+        return out;
+    }
+
+    cv::Mat* exportGaussianT1() {
+        return m_gaussianT1;
+    }
+
+public:
     cv::Vec3d Evaluate(cv::Point uv, float v1, float v2, cv::Point off1, cv::Point off2) override {
         cv::Point uv1 = uv + off1;
         cv::Point uv2 = uv + off2;
