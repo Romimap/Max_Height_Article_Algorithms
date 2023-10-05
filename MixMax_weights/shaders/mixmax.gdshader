@@ -1,9 +1,9 @@
 shader_type canvas_item;
 
-uniform sampler2D T1;
-uniform sampler2D T2;
-uniform sampler2D S1;
-uniform sampler2D S2;
+uniform sampler2D T1 : repeat_enable;
+uniform sampler2D T2 : repeat_enable;
+uniform sampler2D S1 : repeat_enable;
+uniform sampler2D S2 : repeat_enable;
 uniform float lambda = 0.01; 
 
 void vertex() {
@@ -16,16 +16,16 @@ float Phi(float x) {
 
 void fragment() {
 	vec4 t1 = texture(T1, UV);
-	vec4 t2 = texture(T1, UV);
+	vec4 t2 = texture(T2, UV + vec2(0.5));
 	
-	float s1 = texture(S1, UV).x;
-	float s2 = texture(S2, UV).x;
+	float s1 = texture(S1, UV).x - textureLod(S1, vec2(0.5), 100).x;
+	float s2 = texture(S2, UV + vec2(0.5)).x - textureLod(S2, vec2(0.5), 100).x;
 	
-	float v1 = (1.0 - UV.x) * 0.4 + 0.3;
+	float v1 = ((1.0 - UV.x) - 0.5) * 0.5 + 0.5;
 	float v2 = 1.0 - v1;
 	
 	float w = 1.0 - Phi(((s2 + v2) - (s1 + v1))/(2.0 * lambda));
 	
-	COLOR = mix(texture(T2, UV), texture(T1, UV), w);
+	COLOR = mix(t2, t1, w);
 	if (UV.y > 0.35) COLOR.rgb = vec3(w);
 }

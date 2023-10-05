@@ -17,13 +17,9 @@ config/icon="res://icon.svg"
 
 [display]
 
-window/size/viewport_width=1024
-window/size/viewport_height=1024
+window/size/viewport_width=2048
+window/size/viewport_height=512
 
 [dotnet]
 
 project/assembly_name="Mix Max Weights"
-
-[rendering]
-
-scaling_3d/scale=2.0

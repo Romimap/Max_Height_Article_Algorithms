@@ -1,8 +1,7 @@
-[gd_scene load_steps=5 format=3 uid="uid://ci537dr8midg7"]
+[gd_scene load_steps=4 format=3 uid="uid://ci537dr8midg7"]
 
 [ext_resource type="Shader" path="res://shaders/stationnarity.gdshader" id="1_8yjys"]
 [ext_resource type="Script" path="res://screenshot.gd" id="1_mdypo"]
-[ext_resource type="Texture2D" uid="uid://rcahwh0rk4x6" path="res://textures/T.png" id="2_sqjct"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_wvb76"]
 shader = ExtResource("1_8yjys")
@@ -10,7 +9,6 @@ shader_parameter/exponentiation = 1.5
 shader_parameter/lambda = 0.05
 shader_parameter/mask = false
 shader_parameter/symetrisation = true
-shader_parameter/T = ExtResource("2_sqjct")
 
 [node name="Control" type="Control"]
 layout_mode = 3

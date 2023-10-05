@@ -1,47 +1,39 @@
-[gd_scene load_steps=11 format=3 uid="uid://dg2ww400pxrvy"]
+[gd_scene load_steps=7 format=3 uid="uid://dg2ww400pxrvy"]
 
 [ext_resource type="Shader" path="res://shaders/basevariance.gdshader" id="1_0yk0y"]
 [ext_resource type="Script" path="res://screenshot.gd" id="1_rlxh2"]
-[ext_resource type="Texture2D" uid="uid://cehmla2apwhs7" path="res://textures/S1.jpg" id="2_vn2ya"]
-[ext_resource type="Texture2D" uid="uid://bt3rb0cfa7wqp" path="res://textures/S2.jpg" id="3_4pske"]
-[ext_resource type="Texture2D" uid="uid://d125y87wqdays" path="res://textures/T1.png" id="4_hncu0"]
-[ext_resource type="Texture2D" uid="uid://gneun7l4ni4e" path="res://textures/T2.png" id="5_ub74q"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_fb831"]
+render_priority = 0
 shader = ExtResource("1_0yk0y")
 shader_parameter/lambda = 0.0
 shader_parameter/mask = false
-shader_parameter/T1 = ExtResource("4_hncu0")
-shader_parameter/T2 = ExtResource("5_ub74q")
-shader_parameter/S1 = ExtResource("2_vn2ya")
-shader_parameter/S2 = ExtResource("3_4pske")
+shader_parameter/a = 1.0
+shader_parameter/b = 0.0
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_pphed"]
+render_priority = 0
 shader = ExtResource("1_0yk0y")
 shader_parameter/lambda = 0.005
 shader_parameter/mask = false
-shader_parameter/T1 = ExtResource("4_hncu0")
-shader_parameter/T2 = ExtResource("5_ub74q")
-shader_parameter/S1 = ExtResource("2_vn2ya")
-shader_parameter/S2 = ExtResource("3_4pske")
+shader_parameter/a = 1.0
+shader_parameter/b = 0.0
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_1sbmk"]
+render_priority = 0
 shader = ExtResource("1_0yk0y")
 shader_parameter/lambda = 0.0
 shader_parameter/mask = true
-shader_parameter/T1 = ExtResource("4_hncu0")
-shader_parameter/T2 = ExtResource("5_ub74q")
-shader_parameter/S1 = ExtResource("2_vn2ya")
-shader_parameter/S2 = ExtResource("3_4pske")
+shader_parameter/a = 1.0
+shader_parameter/b = 0.0
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_upucs"]
+render_priority = 0
 shader = ExtResource("1_0yk0y")
 shader_parameter/lambda = 0.005
 shader_parameter/mask = true
-shader_parameter/T1 = ExtResource("4_hncu0")
-shader_parameter/T2 = ExtResource("5_ub74q")
-shader_parameter/S1 = ExtResource("2_vn2ya")
-shader_parameter/S2 = ExtResource("3_4pske")
+shader_parameter/a = 1.0
+shader_parameter/b = 0.0
 
 [node name="Control" type="Control"]
 layout_mode = 3

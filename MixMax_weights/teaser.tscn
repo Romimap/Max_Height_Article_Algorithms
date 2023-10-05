@@ -1,4 +1,4 @@
-[gd_scene load_steps=55 format=3 uid="uid://baufb0cy17m81"]
+[gd_scene load_steps=54 format=3 uid="uid://baufb0cy17m81"]
 
 [ext_resource type="Texture2D" uid="uid://cj2m37k084kns" path="res://textures/Rock051_2K-JPG_NormalGL.jpg" id="1_n0s1h"]
 [ext_resource type="Texture2D" uid="uid://bv5nxkmftxdie" path="res://textures/Rock051_2K-JPG_Roughness.jpg" id="2_ud14j"]
@@ -267,6 +267,7 @@ void fragment() {
 	float r1 = texture(R1, uv1).x;
 	float r2 = texture(R2, uv2).x;
 	
+	n1 *= 1.0;
 	
 	float s1 = texture(S1, uv1).x;
 	float s2 = texture(S2, uv2).x;
@@ -286,9 +287,6 @@ void fragment() {
 	ROUGHNESS = mix(r2, r1, w);
 }
 "
-
-[sub_resource type="CompressedTexture2D" id="CompressedTexture2D_bptui"]
-load_path = "res://.godot/imported/Ground067_2K-JPG_NormalGL.jpg-26022b71397ed408334008d0dd463138.s3tc.ctex"
 
 [sub_resource type="CompressedTexture2D" id="CompressedTexture2D_4xafe"]
 load_path = "res://.godot/imported/Ground067_2K-JPG_Roughness.jpg-1def4b739d6a3c6efb7867ee0c6e68e4.s3tc.ctex"
@@ -310,7 +308,7 @@ shader_parameter/ratio1 = 1.0
 shader_parameter/ratio2 = 2.0
 shader_parameter/T1 = SubResource("CompressedTexture2D_16r7a")
 shader_parameter/T2 = ExtResource("12_dcno8")
-shader_parameter/N1 = SubResource("CompressedTexture2D_bptui")
+shader_parameter/N1 = ExtResource("5_s0o6u")
 shader_parameter/N2 = ExtResource("9_3lkkc")
 shader_parameter/R1 = SubResource("CompressedTexture2D_4xafe")
 shader_parameter/R2 = ExtResource("10_0uavf")
