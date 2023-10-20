@@ -1,0 +1,279 @@
+[gd_scene load_steps=16 format=3 uid="uid://seim4gkbsto3"]
+
+[ext_resource type="Texture2D" uid="uid://oodh88cxqm68" path="res://textures/Rock051_2K-JPG_Displacement.jpg" id="1_7jxha"]
+[ext_resource type="Texture2D" uid="uid://cq5da06th7sx1" path="res://textures/Ground054_2K-JPG_Displacement.jpg" id="2_sstk1"]
+[ext_resource type="Texture2D" uid="uid://7kuthv538rm5" path="res://textures/Ground067_2K-JPG_Displacement.jpg" id="2_yfk8k"]
+[ext_resource type="Texture2D" uid="uid://c0tb1adb80m54" path="res://textures/Rock051_2K-JPG_Color.png" id="3_in21f"]
+[ext_resource type="Texture2D" uid="uid://cyp50hj66swju" path="res://textures/Ground037_2K-JPG_Displacement.jpg" id="3_q01vb"]
+[ext_resource type="Texture2D" uid="uid://bclrekg4uhtgc" path="res://textures/Ground054_2K-JPG_Color.png" id="4_e47wk"]
+[ext_resource type="Texture2D" uid="uid://bltvqbw1jdta1" path="res://textures/Ground067_2K-JPG_Color.png" id="5_15wn8"]
+[ext_resource type="Texture2D" uid="uid://cfnhtg2hhf4nj" path="res://textures/Ground037_2K-JPG_Color.png" id="6_q1chq"]
+
+[sub_resource type="Shader" id="Shader_3vju1"]
+code = "shader_type canvas_item;
+
+uniform sampler2D T1 : repeat_enable, filter_linear_mipmap;
+uniform sampler2D T2 : repeat_enable, filter_linear_mipmap;
+uniform sampler2D T3 : repeat_enable, filter_linear_mipmap;
+uniform sampler2D S1 : repeat_enable, filter_linear_mipmap;
+uniform sampler2D S2 : repeat_enable, filter_linear_mipmap;
+uniform sampler2D S3 : repeat_enable, filter_linear_mipmap;
+uniform float lambda = 0.00; 
+
+void vertex() {
+	UV -= 0.5;
+	UV *= 0.75;
+}
+
+float Phi(float x) {
+	return tanh(0.85 * x) * 0.5 + 0.5;
+}
+
+void fragment() {
+	vec4 _t1 = texture(T1, UV);
+	vec4 _t2 = texture(T2, UV);
+	vec4 _t3 = texture(T3, UV);
+	
+	float _s1 = texture(S1, UV).x - textureLod(S1, vec2(0.5), 100).x;
+	float _s2 = texture(S2, UV).x - textureLod(S2, vec2(0.5), 100).x;
+	float _s3 = texture(S3, UV).x - textureLod(S3, vec2(0.5), 100).x;
+	
+	
+	vec2 d = UV;
+	float _v1 = dot(d, vec2(1.0, 0.0)) + _s1 * 1.0;
+	float _v2 = dot(d, vec2(cos(2.0 * PI / 3.0), sin(2.0 * PI / 3.0))) + _s2 * 1.0;
+	float _v3 = dot(d, vec2(cos(4.0 * PI / 3.0), sin(4.0 * PI / 3.0))) + _s3 * 1.0;
+	
+	float v1, v2;
+	vec4 t1, t2;
+	if (_v3 < _v1 && _v3 < _v2) {
+		v1 = _v1;
+		t1 = _t1;
+		v2 = _v2;
+		t2 = _t2;
+	} else if (_v2 < _v1 && _v2 < _v3) {
+		v1 = _v1;
+		t1 = _t1;
+		v2 = _v3;
+		t2 = _t3;
+	} else if (_v1 < _v2 && _v1 < _v3) {
+		v1 = _v2;
+		t1 = _t2;
+		v2 = _v3;
+		t2 = _t3;
+	}
+	
+	float w = 0.0;
+	if (lambda <= 0.00001) {
+		w = (v1 > v2) ? 1.0 : 0.0;
+	} else {
+		w = 1.0 - Phi(((v2) - (v1))/sqrt(lambda * lambda + lambda * lambda));
+	}
+	
+	COLOR = (1.0 - w) * t2 + w * t1;
+}
+"
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_40xj4"]
+shader = SubResource("Shader_3vju1")
+shader_parameter/lambda = 0.02
+shader_parameter/T1 = ExtResource("3_in21f")
+shader_parameter/T2 = ExtResource("5_15wn8")
+shader_parameter/T3 = ExtResource("6_q1chq")
+shader_parameter/S1 = ExtResource("1_7jxha")
+shader_parameter/S2 = ExtResource("2_yfk8k")
+shader_parameter/S3 = ExtResource("3_q01vb")
+
+[sub_resource type="GDScript" id="GDScript_anmwb"]
+script/source = "extends Control
+
+
+var i = 10;
+var path = \"screenshot.png\"
+var T1 : Texture2D
+var T2 : Texture2D
+var S1 : Texture2D
+var S2 : Texture2D
+
+var n = [
+	\"rock\",
+	\"brick\",
+	\"grass\",
+	\"forest\",
+	\"sand\",
+	\"soil\",
+	\"paving\"
+]
+var t_path = [
+	\"res://textures/Rock051_2K-JPG_Color.png\",
+	\"res://textures/Bricks085_2K-JPG_Color.png\",
+	\"res://textures/Grass004_2K-JPG_Color.png\",
+	\"res://textures/Ground037_2K-JPG_Color.png\",
+	\"res://textures/Ground054_2K-JPG_Color.png\",
+	\"res://textures/Ground067_2K-JPG_Color.png\",
+	\"res://textures/PavingStones131_2K-JPG_Color.png\"
+]
+var s_path = [
+	\"res://textures/Rock051_2K-JPG_Displacement.jpg\",
+	\"res://textures/Bricks085_2K-JPG_Displacement.png\",
+	\"res://textures/Grass004_2K-JPG_Displacement.jpg\",
+	\"res://textures/Ground037_2K-JPG_Displacement.jpg\",
+	\"res://textures/Ground054_2K-JPG_Displacement.jpg\",
+	\"res://textures/Ground067_2K-JPG_Displacement.jpg\",
+	\"res://textures/PavingStones131_2K-JPG_Displacement.jpg\"
+]
+
+# Called every frame. 'delta' is the elapsed time since the previous frame.
+var x = 0;
+var y = 0;
+func _process(delta):
+	if i == 0:
+		get_viewport().get_texture().get_image().save_png(\"melange_a_3.png\")
+	i -= 1
+	return;
+	if i == 2:
+		y += 1
+		if y >= 7: 
+			x += 1
+			y = x + 1
+			
+		T1 = load(t_path[x])
+		T2 = load(t_path[y])
+		S1 = load(s_path[x])
+		S2 = load(s_path[y])
+		
+
+		($Lambda1.material as ShaderMaterial).set_shader_parameter(\"T1\", T1)
+		($Lambda1.material as ShaderMaterial).set_shader_parameter(\"T2\", T2)
+		($Lambda1.material as ShaderMaterial).set_shader_parameter(\"S1\", S1)
+		($Lambda1.material as ShaderMaterial).set_shader_parameter(\"S2\", S2)
+		($Lambda2.material as ShaderMaterial).set_shader_parameter(\"T1\", T1)
+		($Lambda2.material as ShaderMaterial).set_shader_parameter(\"T2\", T2)
+		($Lambda2.material as ShaderMaterial).set_shader_parameter(\"S1\", S1)
+		($Lambda2.material as ShaderMaterial).set_shader_parameter(\"S2\", S2)
+		($Lambda3.material as ShaderMaterial).set_shader_parameter(\"T1\", T1)
+		($Lambda3.material as ShaderMaterial).set_shader_parameter(\"T2\", T2)
+		($Lambda3.material as ShaderMaterial).set_shader_parameter(\"S1\", S1)
+		($Lambda3.material as ShaderMaterial).set_shader_parameter(\"S2\", S2)
+		($Lambda4.material as ShaderMaterial).set_shader_parameter(\"T1\", T1)
+		($Lambda4.material as ShaderMaterial).set_shader_parameter(\"T2\", T2)
+		($Lambda4.material as ShaderMaterial).set_shader_parameter(\"S1\", S1)
+		($Lambda4.material as ShaderMaterial).set_shader_parameter(\"S2\", S2)
+	if i == 0:
+		get_viewport().get_texture().get_image().save_jpg(\"lambda_\" + n[x] + \"_\" + n[y] + \".jpg\", 0.9)
+		i = 3
+	i -= 1
+	pass
+"
+
+[sub_resource type="Shader" id="Shader_xfafi"]
+code = "shader_type canvas_item;
+
+uniform sampler2D T1 : repeat_enable, filter_linear_mipmap;
+uniform sampler2D T2 : repeat_enable, filter_linear_mipmap;
+uniform sampler2D S1 : repeat_enable, filter_linear_mipmap;
+uniform sampler2D S2 : repeat_enable, filter_linear_mipmap;
+uniform float lambda = 0.00; 
+
+void vertex() {
+	UV = UV * vec2(1.0, 0.25);
+}
+
+float Phi(float x) {
+	return tanh(0.85 * x) * 0.5 + 0.5;
+}
+
+void fragment() {
+	vec4 t1 = texture(T1, UV);
+	vec4 t2 = texture(T2, UV + vec2(0.5));
+	
+	float s1 = texture(S1, UV).x - textureLod(S1, vec2(0.5), 100).x;
+	float s2 = texture(S2, UV + vec2(0.5)).x - textureLod(S2, vec2(0.5), 100).x;
+	
+	float v1 = ((1.0 - UV.x) - 0.5) * 0.8 + 0.5;
+	float v2 = 1.0 - v1;
+	
+	float w = 0.0;
+	if (lambda <= 0.00001) {
+		w = (s1 + v1 > s2 + v2) ? 1.0 : 0.0;
+	} else {
+		w = 1.0 - Phi(((s2 + v2) - (s1 + v1))/sqrt(lambda * lambda + lambda * lambda));
+	}
+	
+	COLOR = mix(t2, t1, w);
+}
+"
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_hhb1v"]
+shader = SubResource("Shader_xfafi")
+shader_parameter/lambda = 0.01
+shader_parameter/T1 = ExtResource("3_in21f")
+shader_parameter/T2 = ExtResource("4_e47wk")
+shader_parameter/S1 = ExtResource("1_7jxha")
+shader_parameter/S2 = ExtResource("2_sstk1")
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_nmwlc"]
+shader = SubResource("Shader_xfafi")
+shader_parameter/lambda = 0.1
+shader_parameter/T1 = ExtResource("3_in21f")
+shader_parameter/T2 = ExtResource("4_e47wk")
+shader_parameter/S1 = ExtResource("1_7jxha")
+shader_parameter/S2 = ExtResource("2_sstk1")
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_0pt5u"]
+shader = SubResource("Shader_xfafi")
+shader_parameter/lambda = 0.5
+shader_parameter/T1 = ExtResource("3_in21f")
+shader_parameter/T2 = ExtResource("4_e47wk")
+shader_parameter/S1 = ExtResource("1_7jxha")
+shader_parameter/S2 = ExtResource("2_sstk1")
+
+[node name="Control" type="Control"]
+layout_mode = 3
+anchors_preset = 0
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="ColorRect" type="ColorRect" parent="."]
+layout_mode = 1
+offset_right = 515.0
+offset_bottom = 517.0
+color = Color(0, 0, 0, 1)
+
+[node name="Lambda1" type="ColorRect" parent="."]
+material = SubResource("ShaderMaterial_40xj4")
+layout_mode = 0
+offset_right = 1024.0
+offset_bottom = 1024.0
+
+[node name="Control" type="Control" parent="."]
+visible = false
+layout_mode = 3
+anchors_preset = 0
+offset_left = 2.0
+offset_top = 2.0
+offset_right = 2.0
+offset_bottom = 2.0
+scale = Vector2(2, 2)
+script = SubResource("GDScript_anmwb")
+
+[node name="Lambda2" type="ColorRect" parent="Control"]
+material = SubResource("ShaderMaterial_hhb1v")
+layout_mode = 0
+offset_top = 129.0
+offset_right = 513.0
+offset_bottom = 257.0
+
+[node name="Lambda3" type="ColorRect" parent="Control"]
+material = SubResource("ShaderMaterial_nmwlc")
+layout_mode = 0
+offset_top = 258.0
+offset_right = 513.0
+offset_bottom = 386.0
+
+[node name="Lambda4" type="ColorRect" parent="Control"]
+material = SubResource("ShaderMaterial_0pt5u")
+layout_mode = 0
+offset_top = 387.0
+offset_right = 513.0
+offset_bottom = 515.0

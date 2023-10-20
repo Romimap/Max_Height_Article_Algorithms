@@ -1,0 +1,39 @@
+[gd_scene load_steps=13 format=3 uid="uid://f2bvmnjvha7u"]
+
+[ext_resource type="Shader" path="res://mixmax.gdshader" id="1_yph8x"]
+[ext_resource type="Script" path="res://preprocessing.gd" id="2_pu2sn"]
+[ext_resource type="Texture2D" uid="uid://t5s5f10naavt" path="res://textures/Dirt_N.jpg" id="3_gekx3"]
+[ext_resource type="Texture2D" uid="uid://sb7mgaeycwvl" path="res://textures/Dirt_BM.jpg" id="3_i6daq"]
+[ext_resource type="Texture2D" uid="uid://cc5d6m3l7pw8b" path="res://textures/Rock_BM.jpg" id="3_v8wx2"]
+[ext_resource type="Texture2D" uid="uid://x6ddrdpdlv1x" path="res://textures/Dirt_R.jpg" id="5_psr3w"]
+[ext_resource type="Texture2D" uid="uid://dvbp1856okegb" path="res://textures/Rock_N.jpg" id="5_w4psi"]
+[ext_resource type="Texture2D" uid="uid://de56efbp7uq7l" path="res://textures/Dirt_T.jpg" id="7_2ndgb"]
+[ext_resource type="Texture2D" uid="uid://cdaet8v51k2a" path="res://textures/Rock_R.jpg" id="7_ha8l5"]
+[ext_resource type="Texture2D" uid="uid://bmf0kxkk5rmoj" path="res://textures/Rock_T.jpg" id="9_1dgs8"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_nh12k"]
+render_priority = 0
+shader = ExtResource("1_yph8x")
+shader_parameter/lambda = 0.0
+shader_parameter/T1 = ExtResource("7_2ndgb")
+shader_parameter/T2 = ExtResource("9_1dgs8")
+shader_parameter/N1 = ExtResource("3_gekx3")
+shader_parameter/N2 = ExtResource("5_w4psi")
+shader_parameter/R1 = ExtResource("5_psr3w")
+shader_parameter/R2 = ExtResource("7_ha8l5")
+shader_parameter/BM1 = ExtResource("3_i6daq")
+shader_parameter/BM2 = ExtResource("3_v8wx2")
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_0kowm"]
+
+[node name="Root" type="Node3D"]
+
+[node name="Surface" type="MeshInstance3D" parent="."]
+material_override = SubResource("ShaderMaterial_nh12k")
+mesh = SubResource("PlaneMesh_0kowm")
+script = ExtResource("2_pu2sn")
+texture_a = 0
+texture_b = 3
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
+transform = Transform3D(-0.835202, -0.271802, 0.478081, 0.0845432, 0.795536, 0.599979, -0.543406, 0.541522, -0.641454, 0, 0, 0)

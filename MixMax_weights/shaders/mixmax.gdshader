@@ -7,7 +7,7 @@ uniform sampler2D S2 : repeat_enable;
 uniform float lambda = 0.01; 
 
 void vertex() {
-	UV = UV * vec2(1.0, 0.5);
+	UV = UV * vec2(128.0, 256.0-32.0)/(256.0 - 32.0) + vec2(0.5, 0);
 }
 
 float Phi(float x) {
@@ -21,11 +21,11 @@ void fragment() {
 	float s1 = texture(S1, UV).x - textureLod(S1, vec2(0.5), 100).x;
 	float s2 = texture(S2, UV + vec2(0.5)).x - textureLod(S2, vec2(0.5), 100).x;
 	
-	float v1 = ((1.0 - UV.x) - 0.5) * 0.5 + 0.5;
+	float v1 = 0.5;
 	float v2 = 1.0 - v1;
 	
 	float w = 1.0 - Phi(((s2 + v2) - (s1 + v1))/(2.0 * lambda));
 	
 	COLOR = mix(t2, t1, w);
-	if (UV.y > 0.35) COLOR.rgb = vec3(w);
+	if (UV.y > 0.75) COLOR.rgb = vec3(w);
 }

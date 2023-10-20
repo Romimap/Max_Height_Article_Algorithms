@@ -1,0 +1,153 @@
+[gd_scene load_steps=13 format=3 uid="uid://byefmhndghthl"]
+
+[ext_resource type="Shader" path="res://shaders/exemplar.gdshader" id="1_hlj1k"]
+[ext_resource type="Texture2D" uid="uid://7kuthv538rm5" path="res://textures/Ground067_2K-JPG_Displacement.jpg" id="2_bqd6x"]
+[ext_resource type="Texture2D" uid="uid://tt01pes8xxgv" path="res://textures/Ground067_2K-JPG_Color.jpg" id="3_e45jx"]
+[ext_resource type="Texture2D" uid="uid://2w0ulrx1npps" path="res://textures/Grass004_2K-JPG_Displacement.jpg" id="4_ud6k7"]
+[ext_resource type="Texture2D" uid="uid://c7lxmi62kabpl" path="res://textures/Grass004_2K-JPG_Color.jpg" id="5_fvkni"]
+[ext_resource type="Shader" path="res://shaders/linear.gdshader" id="6_ywonv"]
+[ext_resource type="Shader" path="res://shaders/mixmax.gdshader" id="7_im8gi"]
+
+[sub_resource type="GDScript" id="GDScript_pstfk"]
+script/source = "extends Control
+
+
+var i = 10;
+var path = \"screenshot.png\"
+var T1 : Texture2D
+var T2 : Texture2D
+var S1 : Texture2D
+var S2 : Texture2D
+
+var n = [
+	\"brick\",
+	\"grass\",
+	\"forest\",
+	\"sand\",
+	\"soil\",
+	\"paving\",
+	\"rock\"
+]
+var t_path = [
+	\"res://textures/Bricks085_2K-JPG_Color.png\",
+	\"res://textures/Grass004_2K-JPG_Color.png\",
+	\"res://textures/Ground037_2K-JPG_Color.png\",
+	\"res://textures/Ground054_2K-JPG_Color.png\",
+	\"res://textures/Ground067_2K-JPG_Color.png\",
+	\"res://textures/PavingStones131_2K-JPG_Color.png\",
+	\"res://textures/Rock051_2K-JPG_Color.png\"
+]
+var s_path = [
+	\"res://textures/Bricks085_2K-JPG_Displacement.png\",
+	\"res://textures/Grass004_2K-JPG_Displacement.jpg\",
+	\"res://textures/Ground037_2K-JPG_Displacement.jpg\",
+	\"res://textures/Ground054_2K-JPG_Displacement.jpg\",
+	\"res://textures/Ground067_2K-JPG_Displacement.jpg\",
+	\"res://textures/PavingStones131_2K-JPG_Displacement.jpg\",
+	\"res://textures/Rock051_2K-JPG_Displacement.jpg\"
+]
+
+# Called every frame. 'delta' is the elapsed time since the previous frame.
+var x = 0;
+var y = 0;
+func _process(delta):
+	if i == 2:
+		y += 1
+		if y >= 7: 
+			x += 1
+			y = x + 1
+			
+		T1 = load(t_path[x])
+		T2 = load(t_path[y])
+		S1 = load(s_path[x])
+		S2 = load(s_path[y])
+		
+		($T1S1.material as ShaderMaterial).set_shader_parameter(\"T\", T1)
+		($T1S1.material as ShaderMaterial).set_shader_parameter(\"S\", S1)
+		($T2S2.material as ShaderMaterial).set_shader_parameter(\"T\", T2)
+		($T2S2.material as ShaderMaterial).set_shader_parameter(\"S\", S2)
+		($Linear.material as ShaderMaterial).set_shader_parameter(\"T1\", T1)
+		($Linear.material as ShaderMaterial).set_shader_parameter(\"T2\", T2)
+		($MixMax.material as ShaderMaterial).set_shader_parameter(\"T1\", T1)
+		($MixMax.material as ShaderMaterial).set_shader_parameter(\"T2\", T2)
+		($MixMax.material as ShaderMaterial).set_shader_parameter(\"S1\", S1)
+		($MixMax.material as ShaderMaterial).set_shader_parameter(\"S2\", S2)
+	if i == 0:
+		get_viewport().get_texture().get_image().save_jpg(\"lin_mm_\" + n[x] + \"_\" + n[y] + \".jpg\", 0.9)
+		i = 3
+	i -= 1
+	pass
+"
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_b3fcn"]
+shader = ExtResource("1_hlj1k")
+shader_parameter/T = ExtResource("3_e45jx")
+shader_parameter/S = ExtResource("2_bqd6x")
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_6p2t7"]
+shader = ExtResource("1_hlj1k")
+shader_parameter/T = ExtResource("5_fvkni")
+shader_parameter/S = ExtResource("4_ud6k7")
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_kdsl2"]
+shader = ExtResource("6_ywonv")
+shader_parameter/T1 = ExtResource("3_e45jx")
+shader_parameter/T2 = ExtResource("5_fvkni")
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_ty3jg"]
+shader = ExtResource("7_im8gi")
+shader_parameter/lambda = 0.01
+shader_parameter/T1 = ExtResource("3_e45jx")
+shader_parameter/T2 = ExtResource("5_fvkni")
+shader_parameter/S1 = ExtResource("2_bqd6x")
+shader_parameter/S2 = ExtResource("4_ud6k7")
+
+[node name="Control" type="Control"]
+layout_mode = 3
+anchors_preset = 0
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="Control" type="Control" parent="."]
+layout_mode = 3
+anchors_preset = 0
+scale = Vector2(2, 2)
+script = SubResource("GDScript_pstfk")
+
+[node name="ColorRect" type="ColorRect" parent="Control"]
+layout_mode = 1
+offset_left = -1.0
+offset_top = -1.0
+offset_right = 514.0
+offset_bottom = 628.0
+color = Color(0, 0, 0, 1)
+
+[node name="T1S1" type="ColorRect" parent="Control"]
+material = SubResource("ShaderMaterial_b3fcn")
+layout_mode = 0
+offset_left = -6.10352e-05
+offset_top = 1.12057e-05
+offset_right = 256.0
+offset_bottom = 128.0
+
+[node name="T2S2" type="ColorRect" parent="Control"]
+material = SubResource("ShaderMaterial_6p2t7")
+layout_mode = 0
+offset_left = 257.0
+offset_top = 3.05176e-05
+offset_right = 513.0
+offset_bottom = 128.0
+
+[node name="Linear" type="ColorRect" parent="Control"]
+material = SubResource("ShaderMaterial_kdsl2")
+layout_mode = 0
+offset_top = 129.0
+offset_right = 513.0
+offset_bottom = 378.0
+
+[node name="MixMax" type="ColorRect" parent="Control"]
+material = SubResource("ShaderMaterial_ty3jg")
+layout_mode = 0
+offset_top = 379.0
+offset_right = 513.0
+offset_bottom = 627.0
