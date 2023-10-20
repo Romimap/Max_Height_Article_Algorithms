@@ -7,7 +7,6 @@ enum MatId {Dirt, Forest, Paving, Rock, Sand}
 @export var texture_a : MatId = MatId.Rock
 @export var texture_b : MatId = MatId.Forest
 
-
 var T1 : CompressedTexture2D
 var T2 : CompressedTexture2D
 var S1 : CompressedTexture2D
@@ -16,8 +15,6 @@ var N1 : CompressedTexture2D
 var N2 : CompressedTexture2D
 var R1 : CompressedTexture2D
 var R2 : CompressedTexture2D
-
-
 var BM1 : CompressedTexture2D
 var BM2 : CompressedTexture2D
 
